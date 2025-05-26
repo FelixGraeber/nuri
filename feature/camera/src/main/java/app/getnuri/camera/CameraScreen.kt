@@ -120,7 +120,6 @@ fun CameraPreviewScreen(
                         surfaceRequest = surface,
                         autofocusUiState = uiState.autofocusUiState,
                         tapToFocus = viewModel::tapToFocus,
-                        detectedPose = uiState.detectedPose,
                         defaultZoomOptions = uiState.zoomOptions,
                         requestFlipCamera = viewModel::flipCameraDirection,
                         canFlipCamera = uiState.canFlipCamera,
@@ -128,7 +127,6 @@ fun CameraPreviewScreen(
                         zoomRange = uiState.zoomMinRatio..uiState.zoomMaxRatio,
                         zoomLevel = { uiState.zoomLevel },
                         onChangeZoomLevel = viewModel::setZoomLevel,
-                        foldingFeature = foldingFeature,
                         shouldShowRearCameraFeature = viewModel::shouldShowRearDisplayFeature,
                         toggleRearCameraFeature = { viewModel.toggleRearDisplayFeature(activity) },
                         isRearCameraEnabled = uiState.isRearCameraActive,
@@ -188,11 +186,11 @@ fun StatelessCameraPreviewContent(
     onAnimateZoom: (Float) -> Unit,
     requestCaptureImage: () -> Unit,
     modifier: Modifier = Modifier,
-    foldingFeature: FoldingFeature? = null,
     shouldShowRearCameraFeature: () -> Boolean = { false },
     toggleRearCameraFeature: () -> Unit = {},
     isRearCameraEnabled: Boolean = false,
 ) {
+    var aspectRatio by remember { mutableFloatStateOf(9f / 16f) }
     val emptyComposable: @Composable (Modifier) -> Unit = {}
     
     val rearCameraButton: @Composable (Modifier) -> Unit = { rearModifier ->
@@ -231,24 +229,11 @@ fun StatelessCameraPreviewContent(
             )
         },
         rearCameraButton = if (shouldShowRearCameraFeature()) rearCameraButton else emptyComposable,
-        modifier = modifier
-                defaultAspectRatio = aspectRatio,
-            )
-        },
-        rearCameraButton = (
-            if (shouldShowRearCameraFeature()) {
-                rearCameraButton
-            } else {
-                emptyComposable
-            }
-            ),
-        isTabletop = isTableTopPosture(foldingFeature),
         modifier = modifier.onSizeChanged { size ->
             if (size.height > 0) {
-                // Recalculate aspect ratio based on the overall layout size
                 aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)
             }
-        },
+        }
     )
 }
 
@@ -265,37 +250,36 @@ private fun CameraPreviewContent(
     cameraSessionId: Int,
     canFlipCamera: Boolean,
     requestFlipCamera: () -> Unit,
-    detectedPose: Boolean,
     defaultZoomOptions: List<Float>,
     zoomRange: ClosedFloatingPointRange<Float>,
     zoomLevel: () -> Float,
     onChangeZoomLevel: (zoomLevel: Float) -> Unit,
     requestCaptureImage: () -> Unit,
     modifier: Modifier = Modifier,
-    foldingFeature: FoldingFeature? = null,
     shouldShowRearCameraFeature: () -> Boolean = { false },
     toggleRearCameraFeature: () -> Unit = {},
     isRearCameraEnabled: Boolean = false,
 ) {
-  val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val zoomState = remember(cameraSessionId) {
-      ZoomState(
-        initialZoomLevel = zoomLevel(),
-        onChangeZoomLevel = onChangeZoomLevel,
-        zoomRange = zoomRange,
-      )
+        ZoomState(
+            initialZoomLevel = zoomLevel(),
+            onChangeZoomLevel = onChangeZoomLevel,
+            zoomRange = zoomRange,
+        )
     }
+    
     // Delegate the layout to the stateless version
     StatelessCameraPreviewContent(
         viewfinder = { viewfinderModifier ->
             // Provide the actual CameraViewfinder implementation for the slot
-            var aspectRatio by remember { mutableFloatStateOf(9f / 16f) } // Keep aspect ratio logic here if needed by viewfinder
+            var aspectRatio by remember { mutableFloatStateOf(9f / 16f) }
             CameraViewfinder(
                 surfaceRequest = surfaceRequest,
                 autofocusUiState = autofocusUiState,
                 tapToFocus = tapToFocus,
-                onScaleZoom = { scope.launch { zoomState.scaleZoom(it) }},
-                modifier = viewfinderModifier.onSizeChanged { size -> // Apply modifier from slot
+                onScaleZoom = { scope.launch { zoomState.scaleZoom(it) } },
+                modifier = viewfinderModifier.onSizeChanged { size ->
                     if (size.height > 0) {
                         aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)
                     }
@@ -305,12 +289,10 @@ private fun CameraPreviewContent(
         // Pass down all other state and callbacks
         canFlipCamera = canFlipCamera,
         requestFlipCamera = requestFlipCamera,
-        detectedPose = detectedPose,
-        zoomLevel = zoomLevel,
         defaultZoomOptions = defaultZoomOptions,
+        zoomLevel = zoomLevel,
         onAnimateZoom = { scope.launch { zoomState.animatedZoom(it) } },
         requestCaptureImage = requestCaptureImage,
-        foldingFeature = foldingFeature,
         shouldShowRearCameraFeature = shouldShowRearCameraFeature,
         toggleRearCameraFeature = toggleRearCameraFeature,
         isRearCameraEnabled = isRearCameraEnabled,
