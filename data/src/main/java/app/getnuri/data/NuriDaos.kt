@@ -20,6 +20,9 @@ interface MealDao {
 
     @Query("SELECT * FROM meals WHERE id = :mealId")
     fun getMealById(mealId: Long): Flow<Meal?>
+
+    @Query("SELECT * FROM meals WHERE timestamp <= :now ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getMostRecentMealBefore(now: Long): Meal?
 }
 
 @Dao

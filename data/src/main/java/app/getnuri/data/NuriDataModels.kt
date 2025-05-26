@@ -16,7 +16,12 @@ data class Meal(
     val rawExtractedTriggers: List<String>,
     val userConfirmedIngredients: List<String>,
     val userConfirmedTriggers: List<String>,
-    val notes: String? = null
+    val notes: String? = null,
+    val recognizedIngredients: List<Ingredient> = emptyList(),
+    val lat: Double? = null,
+    val lon: Double? = null,
+    val processingState: String = "pending",
+    val opticalModelVer: String? = null
 )
 
 @Entity(
@@ -34,7 +39,25 @@ data class UserFeedback(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(index = true) val mealId: Long,
     val feedbackTimestamp: Long,
-    val feelingDescription: String, // e.g., "Good", "Bloated", "Energized"
+
+    @Deprecated("Replaced by moodScore; kept for graceful migration")
+    val feelingDescription: String,
+
+    val moodScore: Int? = null,   // 1..5
+    val energyScore: Int? = null, // 1..5
+    val via: String? = null,      // "voice" | "chat" | "scale"
+
     val customFeeling: String? = null,
     val feedbackNotes: String? = null
+)
+
+data class Ingredient(
+    val name: String,
+    val quantity: Double? = null,
+    val unit: String? = null
+)
+
+data class SymptomDetail(
+    val name: String,
+    val intensity: Int // 1..5
 )

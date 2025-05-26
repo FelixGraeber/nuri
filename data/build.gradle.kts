@@ -65,4 +65,14 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Encrypted Room (SQLCipher)
+    implementation("net.zetetic:android-database-sqlcipher:4.5.2")
+    implementation("androidx.sqlite:sqlite-ktx:2.3.0")
+
+    // Secure key storage for the SQLCipher pass-phrase
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // Gson for the new converters (if not already present)
+    implementation("com.google.code.gson:gson:2.10")
 }

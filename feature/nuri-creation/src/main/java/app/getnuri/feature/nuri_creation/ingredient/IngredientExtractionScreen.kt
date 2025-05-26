@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
@@ -37,6 +38,7 @@ import app.getnuri.theme.components.ExpressiveCard
 import app.getnuri.theme.components.ExpressiveGradientBackground
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import app.getnuri.theme.components.PrimaryButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -107,22 +109,25 @@ fun IngredientExtractionScreen(
                             )
                             .padding(24.dp)
                     ) {
-                        ExpressiveButton(
-                            onClick = { 
-                                onNextPressed(viewModel.getIngredientsForSaving())
-                            },
+                        // Replaced ExpressiveButton with PrimaryButton to match MealTrackingChoiceScreen
+                        PrimaryButton(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
-                            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
-                        ) {
-                            Text(
-                                "Continue to Wellness Check",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                        }
+                            onClick = {
+                                onNextPressed(viewModel.getIngredientsForSaving())
+                            },
+                            buttonText = "Log Meal",
+                            trailingIcon = {
+                                Row {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Icon(
+                                        Icons.Default.Fastfood,
+                                        contentDescription = null,
+                                    )
+                                }
+                            },
+                        )
                     }
                 }
             }

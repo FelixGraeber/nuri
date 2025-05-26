@@ -43,16 +43,21 @@ import androidx.compose.ui.unit.sp
 import app.getnuri.theme.*
 import app.getnuri.theme.components.AndroidifyTopAppBar
 import kotlinx.coroutines.delay
+import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun WellbeingScreen(
     navigationPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit = {}
+    onBackPressed: () -> Unit = {},
+    viewModel: WellbeingViewModel = hiltViewModel()
 ) {
     var selectedSymptoms by remember { mutableStateOf(setOf<String>()) }
     var customSymptoms by remember { mutableStateOf(listOf<String>()) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -65,6 +70,7 @@ fun WellbeingScreen(
             )
         },
         containerColor = Primary,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         val combinedPadding = PaddingValues(
             start = maxOf(paddingValues.calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr), navigationPadding.calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr)),
@@ -82,7 +88,21 @@ fun WellbeingScreen(
                 selectedSymptoms = selectedSymptoms,
                 customSymptoms = customSymptoms,
                 onSymptomsChanged = { selectedSymptoms = it },
-                onCustomSymptomsChanged = { customSymptoms = it }
+                onCustomSymptomsChanged = { customSymptoms = it },
+                onSubmit = { moodIdx, energyIdx, symptoms, notes, cb ->
+                    viewModel.submitFeedback(
+                        moodScore = moodIdx.takeIf { it >= 0 }?.plus(1),
+                        energyScore = energyIdx.takeIf { it >= 0 }?.plus(1),
+                        symptoms = symptoms.toList(),
+                        notes = notes
+                    ) { success ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                if (success) "Entry saved 🎉" else "Please log a meal first"
+                            )
+                        }
+                    }
+                }
             )
         }
     }
@@ -94,7 +114,14 @@ private fun TrackNowContent(
     selectedSymptoms: Set<String>,
     customSymptoms: List<String>,
     onSymptomsChanged: (Set<String>) -> Unit,
-    onCustomSymptomsChanged: (List<String>) -> Unit
+    onCustomSymptomsChanged: (List<String>) -> Unit,
+    onSubmit: (
+        moodIdx: Int,
+        energyIdx: Int,
+        symptoms: Set<String>,
+        notes: String,
+        cb: (Boolean) -> Unit
+    ) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -149,7 +176,11 @@ private fun TrackNowContent(
         item {
             // Enhanced Submit Button
             Button(
-                onClick = { /* Handle submission */ },
+                onClick = {
+                    onSubmit(-1, -1, selectedSymptoms, "", { _ -> })
+                    onSymptomsChanged(emptySet())
+                    onCustomSymptomsChanged(emptyList())
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(72.dp),
