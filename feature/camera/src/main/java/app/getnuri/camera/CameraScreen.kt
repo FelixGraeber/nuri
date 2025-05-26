@@ -175,15 +175,14 @@ private fun CameraPermissionGrant(
 }
 
 /**
- * A stateless version of the Camera Preview Content, designed for easier testing.
- * It accepts a generic viewfinder composable slot.
+ * A simplified version of the Camera Preview Content without guidance UI.
+ * It accepts a generic viewfinder composable slot and provides basic camera controls.
  */
 @Composable
 fun StatelessCameraPreviewContent(
     viewfinder: @Composable (Modifier) -> Unit,
     canFlipCamera: Boolean,
     requestFlipCamera: () -> Unit,
-    detectedPose: Boolean,
     defaultZoomOptions: List<Float>,
     zoomLevel: () -> Float,
     onAnimateZoom: (Float) -> Unit,
@@ -194,8 +193,8 @@ fun StatelessCameraPreviewContent(
     toggleRearCameraFeature: () -> Unit = {},
     isRearCameraEnabled: Boolean = false,
 ) {
-    var aspectRatio by remember { mutableFloatStateOf(9f / 16f) }
     val emptyComposable: @Composable (Modifier) -> Unit = {}
+    
     val rearCameraButton: @Composable (Modifier) -> Unit = { rearModifier ->
         RearCameraButton(
             isRearCameraEnabled = isRearCameraEnabled,
@@ -209,7 +208,7 @@ fun StatelessCameraPreviewContent(
         captureButton = { captureModifier ->
             CameraCaptureButton(
                 modifier = captureModifier,
-                enabled = detectedPose,
+                enabled = true, // Always enable capture button
                 captureImageClicked = requestCaptureImage,
             )
         },
@@ -220,7 +219,7 @@ fun StatelessCameraPreviewContent(
                     modifier = flipModifier,
                 )
             } else {
-                emptyComposable(flipModifier) // Pass modifier even if empty
+                emptyComposable(flipModifier)
             }
         },
         zoomButton = { zoomModifier ->
@@ -231,20 +230,8 @@ fun StatelessCameraPreviewContent(
                 zoomLevel = zoomLevel,
             )
         },
-        guideText = { guideTextModifier ->
-            AnimatedVisibility(
-                !detectedPose,
-                enter = fadeIn(MaterialTheme.motionScheme.slowEffectsSpec()),
-                exit = fadeOut(MaterialTheme.motionScheme.slowEffectsSpec()),
-                modifier = guideTextModifier,
-            ) {
-                CameraGuideText()
-            }
-        },
-        guide = { guideModifier ->
-            CameraGuide(
-                detectedPose = detectedPose,
-                modifier = guideModifier,
+        rearCameraButton = if (shouldShowRearCameraFeature()) rearCameraButton else emptyComposable,
+        modifier = modifier
                 defaultAspectRatio = aspectRatio,
             )
         },

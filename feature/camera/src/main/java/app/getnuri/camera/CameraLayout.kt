@@ -40,11 +40,7 @@ internal fun CameraLayout(
     captureButton: @Composable (modifier: Modifier) -> Unit,
     flipCameraButton: @Composable (modifier: Modifier) -> Unit,
     zoomButton: @Composable (modifier: Modifier) -> Unit,
-    guideText: @Composable (modifier: Modifier) -> Unit,
-    guide: @Composable (modifier: Modifier) -> Unit,
-    rearCameraButton: @Composable (modifier: Modifier) -> Unit,
-    supportsTabletop: Boolean = supportsTabletop(),
-    isTabletop: Boolean = false,
+    rearCameraButton: @Composable (modifier: Modifier) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -52,57 +48,14 @@ internal fun CameraLayout(
             .fillMaxSize()
             .background(TertiaryContainer),
     ) {
-        when {
-            isAtLeastMedium() && shouldShowTabletopLayout(
-                supportsTabletop = supportsTabletop,
-                isTabletop = isTabletop,
-            ) -> TableTopSupportedCameraLayout(
-                viewfinder,
-                captureButton,
-                flipCameraButton,
-                zoomButton,
-                guideText,
-                guide,
-                rearCameraButton,
-                isTabletop = isTabletop,
-            )
-
-            isAtLeastMedium() && maxWidth > maxHeight -> MediumHorizontalCameraLayout(
-                viewfinder,
-                captureButton,
-                flipCameraButton,
-                zoomButton,
-                guideText,
-                guide,
-            )
-
-            this.maxWidth > maxHeight && allowsFullContent() -> CompactHorizontalCameraLayout(
-                viewfinder,
-                captureButton,
-                flipCameraButton,
-                zoomButton,
-                guideText,
-                guide,
-            )
-
-            this.maxWidth > maxHeight && !allowsFullContent() -> SubCompactHorizontalCameraLayout(
-                viewfinder,
-                captureButton,
-                flipCameraButton,
-                guideText,
-                guide,
-            )
-
-            else -> VerticalCameraLayout(
-                viewfinder,
-                captureButton,
-                flipCameraButton,
-                zoomButton,
-                guideText,
-                guide,
-                rearCameraButton,
-            )
-        }
+        // Always use vertical layout for simplicity
+        VerticalCameraLayout(
+            viewfinder = viewfinder,
+            captureButton = captureButton,
+            flipCameraButton = flipCameraButton,
+            zoomButton = zoomButton,
+            rearCameraButton = rearCameraButton
+        )
     }
 }
 
