@@ -1,5 +1,4 @@
- 
-package app.getnuri.results
+package app.getnuri.feature.results.ui
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOutBack
@@ -44,11 +43,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme // Changed from AndroidifyTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.cos
 import kotlin.math.sin
+// Assuming these are accessible or will be moved/updated later
+import app.getnuri.results.WellbeingData 
+import app.getnuri.results.MockWellbeingDataGenerator
 
 @Composable
 fun WellbeingChartsSection(
@@ -506,7 +508,7 @@ private fun SymptomsScatterChart(
 @Preview
 @Composable
 private fun WellbeingChartsPreview() {
-    AndroidifyTheme {
+    NuriTheme { // Changed from AndroidifyTheme
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -517,4 +519,4 @@ private fun WellbeingChartsPreview() {
             )
         }
     }
-} 
+}

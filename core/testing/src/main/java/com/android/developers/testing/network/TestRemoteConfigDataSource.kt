@@ -80,19 +80,12 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
         return useGeminiNano
     }
 
-    override fun generateBotPrompt(): String {
-        return "generateBotPrompt"
-    }
-
-    override fun promptImageGenerationWithSkinTone(): String {
-        return "Generate image with skin tone"
-    }
+    // generateBotPrompt() was removed
+    // promptImageGenerationWithSkinTone() was removed
     
     override fun getPromoVideoLink(): String {
         return "https://example.com/promo-video.mp4"
     }
     
-    override fun getDancingDroidLink(): String {
-        return "https://example.com/dancing-droid.gif"
-    }
+    // getDancingDroidLink() was removed
 }

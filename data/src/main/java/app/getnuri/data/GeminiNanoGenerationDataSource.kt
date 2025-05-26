@@ -19,7 +19,6 @@ class GeminiNanoGenerationDataSourceImpl @Inject constructor(val downloader: Gem
     }
 
     /**
-     * Generate a prompt to create an Android bot using Gemini Nano.
      * If Gemini Nano is not available, return null.
      */
     override suspend fun generatePrompt(prompt: String): String? {

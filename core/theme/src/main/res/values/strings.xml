@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
  
 <resources>
-    <string name="androidify_title">nuri</string>
+    <string name="app_name_nuri">nuri</string>
 </resources>

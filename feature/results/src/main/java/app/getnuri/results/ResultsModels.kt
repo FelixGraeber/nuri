@@ -124,4 +124,4 @@ object MockWellbeingDataGenerator {
             insights = insights
         )
     }
-} 
+}

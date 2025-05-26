@@ -182,7 +182,7 @@ fun AndroidifyTranslucentTopAppBar(
 @Composable
 private fun AndroidifyTitle(textColor: Color = MaterialTheme.colorScheme.onSurface) {
     Text(
-        text = stringResource(R.string.androidify_title),
+        text = stringResource(R.string.app_name_nuri),
         style = MaterialTheme.typography.titleLarge.copy(
             fontFamily = displayLargeFontFamily,
             fontWeight = FontWeight.Black, // Font weight 900 for maximum impact
