@@ -16,14 +16,20 @@
 package app.getnuri
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy.Builder
+import app.getnuri.background.FEEDBACK_CHANNEL_ID
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
+
 @HiltAndroidApp
 class AndroidifyApplication : Application(), SingletonImageLoader.Factory {
 
@@ -33,6 +39,24 @@ class AndroidifyApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         setStrictModePolicy()
+        createNotificationChannels() // Create notification channels
+    }
+
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Feedback Reminder Channel
+            val feedbackChannelName = "Nuri Feedback Reminders"
+            val feedbackChannelDescription = "Reminders to provide feedback on your meals."
+            val feedbackChannelImportance = NotificationManager.IMPORTANCE_DEFAULT
+            val feedbackChannel = NotificationChannel(FEEDBACK_CHANNEL_ID, feedbackChannelName, feedbackChannelImportance).apply {
+                description = feedbackChannelDescription
+            }
+
+            // Get the NotificationManager service
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(feedbackChannel)
+        }
     }
 
     /**

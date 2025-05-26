@@ -59,7 +59,7 @@
     <string name="error_image_generation_detailed_description">Provide a more detailed description about your bot, include hair color, clothes and accessories.</string>
     <string name="error_image_generation_full_body">Image is not a picture of a person.</string>
     <string name="error_image_generation_not_enough_detail">Image does not have enough detail.</string>
-    <string name="error_image_generation_policy_violation">Androidify can\'t complete this edit. Try a different input.</string>
+    <string name="error_image_generation_policy_violation">nuri can\'t complete this edit. Try a different input.</string>
     <string name="error_image_generation_other">Image failed to generate.</string>
     <string name="error_image_generation_generic">An error occurred whilst uploading, try again later.</string>
     <string name="error_image_generation_no_image_or_prompt">Choose an image or use a prompt instead.</string>
@@ -69,8 +69,7 @@
     <string name="prompt_type_text">Prompt</string>
     <string name="start_transformation_button">Start transformation</string>
     <string name="transform_button">Transform</string>
-    <string name="write_me_a_prompt">Help me write</string>
-    <string name="writing">Writing…</string>
+
     <string name="prompt_text_hint">Describe clothing, accessories, hairstyles, or any unique traits to make your bot a reflection of yourself.</string>
     <string name="error_provide_more_descriptive_bot">Provide a more detailed description about your bot, include hair color, clothes and accessories.</string>
     <string name="error_connectivity">No internet connection, please check your connection and try again.</string>

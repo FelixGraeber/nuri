@@ -27,11 +27,8 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,7 +44,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,7 +51,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
@@ -100,9 +95,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -113,6 +106,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -127,20 +121,14 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import app.getnuri.results.ResultsScreen
 import app.getnuri.theme.AndroidifyTheme
-import app.getnuri.theme.LimeGreen
 import app.getnuri.theme.LocalSharedTransitionScope
-import app.getnuri.theme.Primary90
 import app.getnuri.theme.R
-import app.getnuri.theme.Secondary
 import app.getnuri.theme.SharedElementKey
 import app.getnuri.theme.components.AndroidifyTopAppBar
-import app.getnuri.theme.components.GradientAssistElevatedChip
 import app.getnuri.theme.components.PrimaryButton
 import app.getnuri.theme.components.ScaleIndicationNodeFactory
 import app.getnuri.theme.components.SecondaryOutlinedButton
 import app.getnuri.theme.components.SquiggleBackground
-import app.getnuri.theme.components.gradientChipColorDefaults
-import app.getnuri.theme.components.infinitelyAnimatingLinearGradient
 import app.getnuri.theme.sharedBoundsRevealWithShapeMorph
 import app.getnuri.theme.sharedBoundsWithDefaults
 import app.getnuri.util.AnimatedTextField
@@ -188,7 +176,7 @@ fun CreationScreen(
                 onChooseImageClicked = { pickMedia.launch(PickVisualMediaRequest(it)) },
                 onPromptOptionSelected = creationViewModel::onSelectedPromptOptionChanged,
                 onUndoPressed = creationViewModel::onUndoPressed,
-                onPromptGenerationPressed = creationViewModel::onPromptGenerationClicked,
+
                 onBotColorSelected = creationViewModel::onBotColorChanged,
                 onStartClicked = creationViewModel::startClicked,
             )
@@ -236,7 +224,6 @@ fun EditScreen(
     onChooseImageClicked: (PickVisualMedia.VisualMediaType) -> Unit,
     onPromptOptionSelected: (PromptType) -> Unit,
     onUndoPressed: () -> Unit,
-    onPromptGenerationPressed: () -> Unit,
     onBotColorSelected: (BotColor) -> Unit,
     onStartClicked: () -> Unit,
 ) {
@@ -273,7 +260,7 @@ fun EditScreen(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { contentPadding ->
-        SquiggleBackground(offsetHeightFraction = 0.5f)
+        
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -308,7 +295,7 @@ fun EditScreen(
                                 onChooseImageClicked(PickVisualMedia.ImageOnly)
                             },
                             onUndoPressed = onUndoPressed,
-                            onPromptGenerationPressed = onPromptGenerationPressed,
+
                             onSelectedPromptOptionChanged = onPromptOptionSelected,
                         )
                         Box(
@@ -343,7 +330,7 @@ fun EditScreen(
                             onChooseImageClicked(PickVisualMedia.ImageOnly)
                         },
                         onUndoPressed = onUndoPressed,
-                        onPromptGenerationPressed = onPromptGenerationPressed,
+
                         onSelectedPromptOptionChanged = onPromptOptionSelected,
                     )
                 }
@@ -395,7 +382,6 @@ private fun MainCreationPane(
     onCameraPressed: () -> Unit,
     onChooseImageClicked: () -> Unit = {},
     onUndoPressed: () -> Unit = {},
-    onPromptGenerationPressed: () -> Unit,
     onSelectedPromptOptionChanged: (PromptType) -> Unit,
 ) {
     Box(
@@ -460,9 +446,6 @@ private fun MainCreationPane(
                 PromptType.TEXT.ordinal -> {
                     TextPrompt(
                         textFieldState = uiState.descriptionText,
-                        promptGenerationInProgress = uiState.promptGenerationInProgress,
-                        generatedPrompt = uiState.generatedPrompt,
-                        onPromptGenerationPressed = onPromptGenerationPressed,
                         modifier = Modifier
                             .fillMaxSize()
                             .heightIn(min = 200.dp)
@@ -647,38 +630,11 @@ fun ImagePreview(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun TextPromptGenerationPreview() {
-    AndroidifyTheme {
-        TextPrompt(
-            TextFieldState(),
-            false,
-            generatedPrompt = "wearing a red sweater",
-            {},
-        )
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-private fun TextPromptGenerationInProgressPreview() {
-    AndroidifyTheme {
-        TextPrompt(
-            TextFieldState(),
-            true,
-            generatedPrompt = "wearing a red sweater",
-            {},
-        )
-    }
-}
 
 @Composable
 fun TextPrompt(
     textFieldState: TextFieldState,
-    promptGenerationInProgress: Boolean,
-    generatedPrompt: String? = null,
-    onPromptGenerationPressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
@@ -709,7 +665,6 @@ fun TextPrompt(
         ) {
             AnimatedTextField(
                 textFieldState,
-                targetEndState = generatedPrompt,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxSize(),
@@ -725,58 +680,11 @@ fun TextPrompt(
                     innerTextField()
                 },
             )
-            AnimatedVisibility(
-                !WindowInsets.isImeVisible,
-                enter = fadeIn(MaterialTheme.motionScheme.defaultEffectsSpec()),
-                exit = fadeOut(MaterialTheme.motionScheme.defaultEffectsSpec()),
-            ) {
-                HelpMeWriteButton(promptGenerationInProgress, onPromptGenerationPressed)
-            }
         }
     }
 }
 
-@Composable
-private fun HelpMeWriteButton(
-    promptGenerationInProgress: Boolean,
-    onPromptGenerationPressed: () -> Unit,
-) {
-    val color = if (promptGenerationInProgress) {
-        Brush.infinitelyAnimatingLinearGradient(
-            listOf(
-                LimeGreen,
-                Primary90,
-                Secondary,
-            ),
-        )
-    } else {
-        SolidColor(MaterialTheme.colorScheme.surfaceContainerLow)
-    }
-    GradientAssistElevatedChip(
-        onClick = {
-            onPromptGenerationPressed()
-        },
-        label = {
-            if (promptGenerationInProgress) {
-                Text(stringResource(CreationR.string.writing))
-            } else {
-                Text(stringResource(CreationR.string.write_me_a_prompt))
-            }
-        },
-        leadingIcon = {
-            Icon(
-                rememberVectorPainter(ImageVector.vectorResource(CreationR.drawable.pen_spark_24)),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
-        },
-        colors = gradientChipColorDefaults().copy(
-            containerColor = color,
-            disabledContainerColor = color,
-        ),
-        enabled = !promptGenerationInProgress,
-    )
-}
+
 
 @Composable
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -868,6 +776,7 @@ private fun UploadEmptyState(
     ) {
         Text(
             stringResource(CreationR.string.photo_picker_title),
+            style = MaterialTheme.typography.headlineMedium,
             fontSize = 28.sp,
             textAlign = TextAlign.Center,
             lineHeight = 40.sp,

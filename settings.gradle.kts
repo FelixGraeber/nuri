@@ -28,18 +28,25 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Androidify"
+rootProject.name = "Nuri"
 include(":app")
 
-include(":feature")
-include(":feature:camera")
-include(":feature:creation")
-include(":feature:home")
-include(":feature:results")
-include(":data")
+// Core modules
 include(":core")
 include(":core:network")
 include(":core:util")
 include(":core:theme")
 include(":core:testing")
+
+// Feature modules
+include(":feature:camera")
+include(":feature:creation")
+include(":feature:nuri-creation")
+include(":feature:home")
+include(":feature:results")
+include(":feature:history")
+include(":feature:wellbeing")
+
+// Data and other modules
+include(":data")
 include(":benchmark")
