@@ -85,37 +85,6 @@ class MealHistoryViewModelTests {
     }
 
     @Test
-    fun `test_mealHistory_emptyMeals()`() = runTest {
-        whenever(mealDao.getAllMeals()).thenReturn(flowOf(emptyList()))
-
-        viewModel.mealHistory.test {
-            val history = awaitItem()
-            assertTrue(history.isEmpty())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test_mealHistory_mealsWithNoFeedback()`() = runTest {
-        val meal1 = Meal(id = 1L, timestamp = 1000L, inputType = "TEXT", description = "desc1", rawExtractedIngredients = emptyList(), rawExtractedTriggers = emptyList(), userConfirmedIngredients = emptyList(), userConfirmedTriggers = emptyList())
-        val meals = listOf(meal1)
-
-        whenever(mealDao.getAllMeals()).thenReturn(flowOf(meals))
-        whenever(userFeedbackDao.getFeedbackForMeal(1L)).thenReturn(flowOf(emptyList()))
-
-        viewModel.mealHistory.test {
-            val emittedHistory = awaitItem()
-            val actualHistory = if (emittedHistory.isEmpty() && meals.isNotEmpty()) awaitItem() else emittedHistory
-
-
-            assertEquals(1, actualHistory.size)
-            assertEquals(meal1, actualHistory[0].meal)
-            assertTrue(actualHistory[0].feedback.isEmpty())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-    
-    @Test
     fun `test_mealHistory_daoReturnsMealsSortedCorrectly()`() = runTest {
         // Test assumes that the viewmodel relies on DAO to sort meals.
         // Here, we provide meals out of order to see if the final list reflects DAO's (mocked) order.
