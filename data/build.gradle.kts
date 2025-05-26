@@ -27,6 +27,7 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -36,11 +37,10 @@ android {
     kotlinOptions {
         jvmTarget = libs.versions.jvmTarget.get()
     }
-}
-// Explicitly disable the connectedAndroidTest task for this module
-androidComponents {
-    beforeVariants(selector().all()) { variant ->
-        variant.enableAndroidTest = false
+    packagingOptions { // Required for Hilt + Robolectric/some test setups
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
@@ -65,4 +65,18 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Health Connect
+    implementation("androidx.health.connect:connect-client:1.1.0-rc01")
+
+    // Core Android testing libraries
+    androidTestImplementation("androidx.test.core:core-ktx:1.5.0")
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.1.5")
+    androidTestImplementation("junit:junit:4.13.2")
+
+    // Room testing
+    androidTestImplementation("androidx.room:room-testing:2.6.1") // Match Room version
+
+    // Coroutines testing
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 }

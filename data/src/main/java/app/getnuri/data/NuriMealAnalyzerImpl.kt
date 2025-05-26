@@ -40,16 +40,12 @@ class NuriMealAnalyzerImpl @Inject constructor(
                 Ingredient Name 2 | Quantity Unit
                 Ingredient Name 3 | Quantity Unit
                 
-                Triggers:
-                trigger1, trigger2, trigger3
-                
                 Guidelines:
                 - Use realistic portion sizes for a single serving
                 - Use common units: g (grams), ml (milliliters), pieces, tbsp, tsp
-                - Format each ingredient as "Name | Quantity Unit" on separate lines
-                - Only include common allergens/triggers that are likely present
+                - Format each ingredient as "Name | Quantity Unit" on separate lines. If quantity or unit is unknown, it can be omitted, e.g., "Ingredient Name | " or just "Ingredient Name".
                 
-                Provide ONLY the Ingredients and Triggers sections as shown above.
+                Provide ONLY the Ingredients section as shown above.
                 """
 
                 // Call FirebaseAiDataSource with nutrition-focused prompt
@@ -61,8 +57,7 @@ class NuriMealAnalyzerImpl @Inject constructor(
                 } else {
                     // Parse the responseText
                     val ingredients = parseIngredientsList(responseText)
-                    val triggers = parseList(responseText, "Triggers:")
-                    Result.success(MealAnalysisData(ingredients, triggers))
+                    Result.success(MealAnalysisData(ingredients))
                 }
             } catch (e: Exception) {
                 Result.failure(Exception("Failed during text analysis: ${e.message}", e))
@@ -145,13 +140,12 @@ class NuriMealAnalyzerImpl @Inject constructor(
                 
                 AI Analysis: "$aiDescription"
                 
-                Convert this analysis into structured ingredient and trigger data:
+                Convert this analysis into structured ingredient data:
                 
                 Ingredients:
-                [List ingredients with quantities]
+                [List ingredients with quantities and units, e.g., "Chicken Breast | 100 g", "Olive Oil | 1 tbsp"]
                 
-                Triggers:
-                [List potential allergens/triggers]
+                Provide ONLY the Ingredients section.
                 """
 
                 val aiResponse = firebaseAiDataSource.generateNutritionPrompt(fullPrompt)
@@ -162,8 +156,7 @@ class NuriMealAnalyzerImpl @Inject constructor(
                     Result.success(parseAiDescriptionFallback(aiDescription))
                 } else {
                     val ingredients = parseIngredientsList(responseText)
-                    val triggers = parseList(responseText, "Triggers:")
-                    Result.success(MealAnalysisData(ingredients, triggers))
+                    Result.success(MealAnalysisData(ingredients))
                 }
             } catch (e: Exception) {
                 // Fallback on error
@@ -173,38 +166,46 @@ class NuriMealAnalyzerImpl @Inject constructor(
     }
 
     private fun parseAiDescriptionFallback(description: String): MealAnalysisData {
-        // Simple fallback parsing
-        val ingredients = description.split(",", ".", "and")
+        // Simple fallback parsing: extract potential item names
+        val ingredients = description.split(Regex("[,.]|\\band\\b"))
             .map { it.trim() }
-            .filter { it.isNotBlank() && it.length > 2 }
-            .take(5)
-            .map { "$it | estimated portion" }
-        
-        val commonTriggers = listOf("gluten", "dairy", "eggs", "nuts", "soy")
-        val detectedTriggers = commonTriggers.filter { trigger ->
-            description.lowercase().contains(trigger)
-        }
+            .filter { it.isNotBlank() && it.length > 2 && !it.equals("and", ignoreCase = true) }
+            .take(5) // Limit to a few items for fallback
+            .map { AnalyzedIngredient(name = it, quantity = null, unit = null) }
         
         return MealAnalysisData(
-            extractedIngredients = ingredients.ifEmpty { listOf("Unknown food items | unknown quantity") },
-            potentialTriggers = detectedTriggers.ifEmpty { listOf("none detected") }
+            extractedIngredients = ingredients.ifEmpty { 
+                listOf(AnalyzedIngredient(name = "Unknown food item", quantity = null, unit = null)) 
+            }
         )
     }
 
-    private fun parseList(text: String, heading: String): List<String> {
-        return text.lines()
-            .find { it.trim().startsWith(heading, ignoreCase = true) }
-            ?.substringAfter(heading)
-            ?.split(',')
-            ?.map { it.trim() }
-            ?.filter { it.isNotEmpty() }
-            ?: emptyList()
-    }
+    private fun parseIngredientsList(text: String): List<AnalyzedIngredient> {
+        val ingredientsSection = text.lines()
+            .dropWhile { !it.trim().startsWith("Ingredients:", ignoreCase = true) }
+            .drop(1) // Remove the "Ingredients:" line itself
+            .takeWhile { it.trim().isNotEmpty() && !it.trim().startsWith("Triggers:", ignoreCase = true) } // Stop if triggers accidentally included
 
-    private fun parseIngredientsList(text: String): List<String> {
-        return text.lines()
-            .filter { it.contains("|") && it.trim().isNotEmpty() }
-            .map { it.trim() }
+        return ingredientsSection
+            .map { line -> line.trim() }
             .filter { it.isNotEmpty() }
+            .mapNotNull { line ->
+                val parts = line.split("|", limit = 2).map { it.trim() }
+                val name = parts.getOrNull(0)
+                if (name.isNullOrBlank()) {
+                    return@mapNotNull null // Skip if name is blank
+                }
+
+                val quantityAndUnitString = parts.getOrNull(1)
+                var quantity: String? = null
+                var unit: String? = null
+
+                if (!quantityAndUnitString.isNullOrBlank()) {
+                    val quantityParts = quantityAndUnitString.split(Regex("\\s+"), limit = 2)
+                    quantity = quantityParts.getOrNull(0)?.takeIf { it.isNotBlank() }
+                    unit = quantityParts.getOrNull(1)?.takeIf { it.isNotBlank() }
+                }
+                AnalyzedIngredient(name = name, quantity = quantity, unit = unit)
+            }
     }
 }

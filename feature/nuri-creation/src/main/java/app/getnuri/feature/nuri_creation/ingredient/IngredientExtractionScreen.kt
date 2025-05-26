@@ -45,7 +45,7 @@ fun IngredientExtractionScreen(
     mealImageUri: String?,
     analysisData: MealAnalysisData?,
     onBackPressed: () -> Unit = {},
-    onNextPressed: (List<String>) -> Unit = {},
+    onNextPressed: (List<ExtractedIngredient>) -> Unit = {},
     onEditIngredient: (Int, ExtractedIngredient) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     viewModel: IngredientExtractionViewModel = hiltViewModel()
@@ -109,7 +109,7 @@ fun IngredientExtractionScreen(
                     ) {
                         ExpressiveButton(
                             onClick = { 
-                                onNextPressed(viewModel.getIngredientsForSaving())
+                                onNextPressed(uiState.value.ingredients)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

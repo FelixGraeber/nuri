@@ -6,15 +6,28 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-@ProvidedTypeConverter
-class StringListConverter @Inject constructor() { // Added @Inject for Hilt
+@ProvidedTypeConverter // Make this the main converter class
+class NuriTypeConverters @Inject constructor() { // Assuming Hilt injection might be needed
+
+    // For List<String>
     @TypeConverter
-    fun fromString(value: String): List<String> {
-        return Json.decodeFromString(value)
+    fun fromStringListString(value: String?): List<String>? {
+        return value?.let { Json.decodeFromString<List<String>>(it) }
     }
 
     @TypeConverter
-    fun toString(list: List<String>): String {
-        return Json.encodeToString(list)
+    fun toStringListString(list: List<String>?): String? {
+        return list?.let { Json.encodeToString(it) }
+    }
+
+    // For List<Long>
+    @TypeConverter
+    fun fromLongListString(list: List<Long>?): String? {
+        return list?.joinToString(",")
+    }
+
+    @TypeConverter
+    fun toLongListFromString(data: String?): List<Long>? {
+        return data?.split(',')?.mapNotNull { it.toLongOrNull() }
     }
 }

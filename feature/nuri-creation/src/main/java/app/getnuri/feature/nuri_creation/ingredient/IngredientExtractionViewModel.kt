@@ -66,15 +66,18 @@ class IngredientExtractionViewModel @Inject constructor() : ViewModel() {
         }
     }
     
-    fun getIngredientsForSaving(): List<String> {
-        return _uiState.value.ingredients.map { ingredient ->
-            if (ingredient.quantity.isNotBlank() && ingredient.unit.isNotBlank()) {
-                "${ingredient.name} | ${ingredient.quantity}${ingredient.unit}"
-            } else if (ingredient.quantity.isNotBlank()) {
-                "${ingredient.name} | ${ingredient.quantity}"
-            } else {
-                ingredient.name
-            }
+    fun prepareIngredientsForSaving(mealId: Long): List<app.getnuri.data.Ingredient> {
+        return _uiState.value.ingredients.map { extractedIngredient ->
+            app.getnuri.data.Ingredient(
+                // id is auto-generated, so 0L is fine for new entities
+                id = 0L, 
+                mealId = mealId,
+                name = extractedIngredient.name,
+                // Assuming quantity is a valid double string;
+                // consider adding try-catch for robust parsing if needed.
+                quantity = extractedIngredient.quantity.toDoubleOrNull() ?: 0.0, 
+                unit = extractedIngredient.unit
+            )
         }
     }
-} 
+}

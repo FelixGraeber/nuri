@@ -12,10 +12,6 @@ data class Meal(
     val inputType: String, // "PHOTO", "TEXT"
     val photoUri: String? = null,
     val description: String? = null,
-    val rawExtractedIngredients: List<String>,
-    val rawExtractedTriggers: List<String>,
-    val userConfirmedIngredients: List<String>,
-    val userConfirmedTriggers: List<String>,
     val notes: String? = null
 )
 
@@ -37,4 +33,63 @@ data class UserFeedback(
     val feelingDescription: String, // e.g., "Good", "Bloated", "Energized"
     val customFeeling: String? = null,
     val feedbackNotes: String? = null
+)
+
+@Entity(
+    tableName = "ingredients",
+    foreignKeys = [
+        ForeignKey(
+            entity = Meal::class,
+            parentColumns = ["id"],
+            childColumns = ["mealId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class Ingredient(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(index = true) val mealId: Long,
+    val name: String,
+    val quantity: Double,
+    val unit: String
+)
+
+@Entity(tableName = "symptoms")
+data class Symptom(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val userId: Long, // Placeholder for now, no direct FK
+    val timestamp: Long,
+    val name: String,
+    val severity: Int,
+    val notes: String? = null
+)
+
+@Entity(tableName = "health_data")
+data class HealthData(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val userId: Long, // Placeholder for now, no direct FK
+    val type: String,
+    val value: String,
+    val unit: String,
+    val timestamp: Long,
+    val source: String
+)
+
+@Entity(tableName = "analysis_results")
+@androidx.room.TypeConverters(NuriTypeConverters::class) // Specify here if type converters are specific to this table
+data class AnalysisResult(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val timestamp: Long, // When the analysis was generated
+    val title: String, // Short summary of the finding
+    val description: String, // Detailed explanation
+    val type: String, // e.g., "Correlation", "PotentialIntolerance", "Pattern"
+    val confidence: Float, // 0.0 to 1.0
+    
+    // Using TypeConverters for these lists
+    val relatedMealIds: List<Long>? = null,
+    val relatedSymptomIds: List<Long>? = null,
+    val relatedHealthDataIds: List<Long>? = null,
+    
+    val userFeedback: String? = null, // e.g., "Helpful", "Dismissed"
+    val aiModelVersion: String? = null
 )

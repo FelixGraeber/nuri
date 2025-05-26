@@ -22,6 +22,7 @@ import app.getnuri.util.LocalFileProvider
 import app.getnuri.util.LocalFileProviderImpl
 import app.getnuri.vertexai.FirebaseAiDataSource
 import app.getnuri.vertexai.FirebaseAiDataSourceImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,86 +36,110 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal object DataModule {
+internal abstract class DataModule { // Changed to abstract class for @Binds
 
-    @Provides
-    @Singleton
-    fun provideNuriMealAnalyzer(impl: NuriMealAnalyzerImpl): NuriMealAnalyzer = impl
+    @Binds
+    abstract fun bindHealthConnectRepository(impl: HealthConnectRepositoryImpl): HealthConnectRepository
 
-    @Provides
-    @Singleton
-    fun provideStringListConverter(): StringListConverter = StringListConverter()
+    // Companion object for @Provides methods if any remain, or move them to another object module
+    companion object {
+        @Provides
+        @Singleton
+        fun provideNuriMealAnalyzer(impl: NuriMealAnalyzerImpl): NuriMealAnalyzer = impl
 
-    @Provides
-    @Singleton
-    fun provideNuriDatabase(
-        @ApplicationContext context: Context,
-        stringListConverter: StringListConverter
-    ): NuriDatabase {
-        return Room.databaseBuilder(context, NuriDatabase::class.java, "nuri_database.db")
-            .addTypeConverter(stringListConverter)
-            .fallbackToDestructiveMigration()
-            .build()
+        // NuriTypeConverters is now @ProvidedTypeConverter and injected by Hilt into NuriDatabase.
+        // So, explicit provision of StringListConverter or NuriTypeConverters here for the database builder
+        // is not needed if NuriDatabase correctly uses @TypeConverters(NuriTypeConverters::class)
+        // and NuriTypeConverters is @ProvidedTypeConverter @Inject constructor().
+
+        @Provides
+        @Singleton
+        fun provideNuriDatabase(
+            @ApplicationContext context: Context,
+            // stringListConverter: StringListConverter // No longer needed here
+            nuriTypeConverters: NuriTypeConverters // For Room to auto-inject if needed
+        ): NuriDatabase {
+            return Room.databaseBuilder(context, NuriDatabase::class.java, "nuri_database.db")
+                // .addTypeConverter(stringListConverter) // Removed
+                .addTypeConverter(nuriTypeConverters) // Added NuriTypeConverters
+                .addMigrations(NuriDatabase.MIGRATION_1_2, NuriDatabase.MIGRATION_2_3) // Added MIGRATION_2_3
+                .build()
+        }
+
+        @Provides
+        fun provideMealDao(database: NuriDatabase): MealDao = database.mealDao()
+
+        @Provides
+        fun provideUserFeedbackDao(database: NuriDatabase): UserFeedbackDao = database.userFeedbackDao()
+
+        // Need to provide IngredientDao, SymptomDao, HealthDataDao as well
+        @Provides
+        fun provideIngredientDao(database: NuriDatabase): IngredientDao = database.ingredientDao()
+
+        @Provides
+        fun provideSymptomDao(database: NuriDatabase): SymptomDao = database.symptomDao()
+
+        @Provides
+        fun provideHealthDataDao(database: NuriDatabase): HealthDataDao = database.healthDataDao()
+
+        @Provides
+        fun provideAnalysisResultDao(database: NuriDatabase): AnalysisResultDao = database.analysisResultDao()
+
+
+        @Provides
+        @Named("IO")
+        fun ioDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+        @Provides
+        @Singleton
+        fun provideLocalFileProvider(@ApplicationContext appContext: Context): LocalFileProvider =
+            LocalFileProviderImpl(appContext)
+
+        @Provides
+        @Singleton
+        fun provideRemoteConfigDataSource(): RemoteConfigDataSource = RemoteConfigDataSourceImpl()
+
+        @Provides
+        fun provideConfigProvider(remoteConfigDataSource: RemoteConfigDataSource): ConfigProvider =
+            ConfigProvider(remoteConfigDataSource)
+
+        @Provides
+        @Singleton
+        fun providesGeminiNanoDownloader(@ApplicationContext appContext: Context): GeminiNanoDownloader =
+            GeminiNanoDownloader(appContext)
+
+        @Provides
+        @Singleton
+        fun providesInternetConnectivityManager(@ApplicationContext appContext: Context): InternetConnectivityManager =
+            InternetConnectivityManagerImpl(appContext)
+
+        @Provides
+        @Singleton
+        fun providesFirebaseVertexAiDataSource(remoteConfigDataSource: RemoteConfigDataSource): FirebaseAiDataSource =
+            FirebaseAiDataSourceImpl(remoteConfigDataSource)
+
+
+        @Provides
+        @Singleton
+        fun providesGeminiNanoDataSource(geminiNanoDownloader: GeminiNanoDownloader): GeminiNanoGenerationDataSource =
+            GeminiNanoGenerationDataSourceImpl(geminiNanoDownloader)
+
+        @Provides
+        @Singleton
+        fun imageGenerationRepository(
+            remoteConfigDataSource: RemoteConfigDataSource,
+            localFileProvider: LocalFileProvider,
+            internetConnectivityManager: InternetConnectivityManager,
+            firebaseAiDataSource: FirebaseAiDataSource,
+            geminiNanoGenerationDataSource: GeminiNanoGenerationDataSource,
+        ): ImageGenerationRepository = ImageGenerationRepositoryImpl(
+            remoteConfigDataSource = remoteConfigDataSource,
+            localFileProvider = localFileProvider,
+            geminiNanoDataSource = geminiNanoGenerationDataSource,
+            internetConnectivityManager = internetConnectivityManager,
+            firebaseAiDataSource = firebaseAiDataSource,
+        )
     }
-
-    @Provides
-    fun provideMealDao(database: NuriDatabase): MealDao = database.mealDao()
-
-    @Provides
-    fun provideUserFeedbackDao(database: NuriDatabase): UserFeedbackDao = database.userFeedbackDao()
-
-    @Provides
-    @Named("IO")
-    fun ioDispatcher(): CoroutineDispatcher = Dispatchers.IO
-
-    @Provides
-    @Singleton
-    fun provideLocalFileProvider(@ApplicationContext appContext: Context): LocalFileProvider =
-        LocalFileProviderImpl(appContext)
-
-    @Provides
-    @Singleton
-    fun provideRemoteConfigDataSource(): RemoteConfigDataSource = RemoteConfigDataSourceImpl()
-
-    @Provides
-    fun provideConfigProvider(remoteConfigDataSource: RemoteConfigDataSource): ConfigProvider =
-        ConfigProvider(remoteConfigDataSource)
-
-    @Provides
-    @Singleton
-    fun providesGeminiNanoDownloader(@ApplicationContext appContext: Context): GeminiNanoDownloader =
-        GeminiNanoDownloader(appContext)
-
-    @Provides
-    @Singleton
-    fun providesInternetConnectivityManager(@ApplicationContext appContext: Context): InternetConnectivityManager =
-        InternetConnectivityManagerImpl(appContext)
-
-    @Provides
-    @Singleton
-    fun providesFirebaseVertexAiDataSource(remoteConfigDataSource: RemoteConfigDataSource): FirebaseAiDataSource =
-        FirebaseAiDataSourceImpl(remoteConfigDataSource)
-
-
-
-    @Provides
-    @Singleton
-    fun providesGeminiNanoDataSource(geminiNanoDownloader: GeminiNanoDownloader): GeminiNanoGenerationDataSource =
-        GeminiNanoGenerationDataSourceImpl(geminiNanoDownloader)
-
-    @Provides
-    @Singleton
-    fun imageGenerationRepository(
-        remoteConfigDataSource: RemoteConfigDataSource,
-        localFileProvider: LocalFileProvider,
-        internetConnectivityManager: InternetConnectivityManager,
-        firebaseAiDataSource: FirebaseAiDataSource,
-        geminiNanoGenerationDataSource: GeminiNanoGenerationDataSource,
-    ): ImageGenerationRepository = ImageGenerationRepositoryImpl(
-        remoteConfigDataSource = remoteConfigDataSource,
-        localFileProvider = localFileProvider,
-        geminiNanoDataSource = geminiNanoGenerationDataSource,
-        internetConnectivityManager = internetConnectivityManager,
-        firebaseAiDataSource = firebaseAiDataSource,
-    )
 }
+
+

@@ -23,26 +23,12 @@ data class IngredientExtractionUiState(
 )
 
 fun MealAnalysisData.toExtractedIngredients(): List<ExtractedIngredient> {
-    return extractedIngredients.map { ingredient ->
-        // Simple parsing - you might want to make this more sophisticated
-        val parts = ingredient.split("|", limit = 2)
-        if (parts.size == 2) {
-            val name = parts[0].trim()
-            val quantityPart = parts[1].trim()
-            
-            // Extract quantity and unit (e.g., "120g" -> "120" and "g")
-            val quantityRegex = Regex("(\\d+\\.?\\d*)\\s*([a-zA-Z]*)")
-            val match = quantityRegex.find(quantityPart)
-            
-            if (match != null) {
-                val quantity = match.groupValues[1]
-                val unit = match.groupValues[2]
-                ExtractedIngredient(name, quantity, unit)
-            } else {
-                ExtractedIngredient(name, quantityPart, "")
-            }
-        } else {
-            ExtractedIngredient(ingredient, "", "")
-        }
+    return extractedIngredients.map { analyzedIngredient ->
+        ExtractedIngredient(
+            name = analyzedIngredient.name,
+            quantity = analyzedIngredient.quantity ?: "",
+            unit = analyzedIngredient.unit ?: "",
+            isEditable = true // Defaulting to true, as per original class structure
+        )
     }
-} 
+}

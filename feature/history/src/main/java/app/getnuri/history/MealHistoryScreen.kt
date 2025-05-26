@@ -50,7 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.getnuri.history.model.MealWithFeedback
+import app.getnuri.history.model.MealWithDetails
 import app.getnuri.theme.Primary
 import app.getnuri.theme.Secondary
 import app.getnuri.theme.EditorialTypography
@@ -82,7 +82,7 @@ sealed class TimelineEntry {
     abstract val date: LocalDate
     
     data class MealEntry(
-        val mealWithFeedback: MealWithFeedback,
+        val mealDetails: MealWithDetails,
         override val timestamp: Long,
         override val date: LocalDate
     ) : TimelineEntry()
@@ -111,27 +111,18 @@ fun MealHistoryScreen(
         val entries = mutableListOf<TimelineEntry>()
         
         // Add meal entries
-        mealHistory.forEach { mealWithFeedback ->
+        mealHistory.forEach { mealDetails -> // mealDetails is now MealWithDetails
             entries.add(
                 TimelineEntry.MealEntry(
-                    mealWithFeedback = mealWithFeedback,
-                    timestamp = mealWithFeedback.meal.timestamp,
-                    date = timestampToLocalDate(mealWithFeedback.meal.timestamp)
+                    mealDetails = mealDetails, // Pass MealWithDetails
+                    timestamp = mealDetails.meal.timestamp,
+                    date = timestampToLocalDate(mealDetails.meal.timestamp)
                 )
             )
-            
-            // Add wellbeing entries from feedback
-            mealWithFeedback.feedback.forEach { feedback ->
-                entries.add(
-                    TimelineEntry.WellbeingEntry(
-                        description = feedback.feelingDescription,
-                        feeling = feedback.feelingDescription,
-                        notes = feedback.feedbackNotes,
-                        timestamp = feedback.feedbackTimestamp,
-                        date = timestampToLocalDate(feedback.feedbackTimestamp)
-                    )
-                )
-            }
+            // Feedback is part of mealDetails.
+            // The decision on whether to create separate WellbeingEntry items from this feedback
+            // or only show it within the meal's expanded view is deferred.
+            // For now, removing the loop that created WellbeingEntry from mealWithFeedback.feedback.
         }
         
         // Group by date and sort
@@ -191,7 +182,7 @@ fun MealHistoryScreen(
                         items = entriesForDate.sortedByDescending { it.timestamp },
                         key = { entry -> 
                             when (entry) {
-                                is TimelineEntry.MealEntry -> "meal_${entry.mealWithFeedback.meal.id}"
+                                is TimelineEntry.MealEntry -> "meal_${entry.mealDetails.meal.id}" // Use mealDetails
                                 is TimelineEntry.WellbeingEntry -> "wellbeing_${entry.timestamp}"
                             }
                         }
@@ -199,11 +190,13 @@ fun MealHistoryScreen(
                         when (entry) {
                             is TimelineEntry.MealEntry -> {
                                 ExpressiveMealTimelineItem(
-                                    mealWithFeedback = entry.mealWithFeedback,
+                                    mealDetails = entry.mealDetails,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
                             is TimelineEntry.WellbeingEntry -> {
+                                // This part remains, assuming WellbeingEntry might be sourced from elsewhere
+                                // or if a future decision is made to re-introduce them from feedback.
                                 ExpressiveWellbeingTimelineItem(
                                     description = entry.description,
                                     feeling = entry.feeling,
@@ -338,11 +331,11 @@ val BunShape = GenericShape { size, _ ->
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ExpressiveMealTimelineItem(
-    mealWithFeedback: MealWithFeedback,
+    mealDetails: MealWithDetails,
     modifier: Modifier = Modifier
 ) {
-    val meal = mealWithFeedback.meal
-    val feedbackList = mealWithFeedback.feedback
+    val meal = mealDetails.meal
+    // val feedbackList = mealDetails.feedback // Available if needed
     var isExpanded by remember { mutableStateOf(false) }
     val sharedTransitionScope = LocalSharedTransitionScope.current
 
@@ -480,26 +473,27 @@ fun ExpressiveMealTimelineItem(
                     if (isExpanded) {
                         Spacer(modifier = Modifier.height(12.dp))
                         
-                        // Show ingredients, triggers, notes, and feedback
-                        if (meal.rawExtractedIngredients.isNotEmpty()) {
+                        // Show ingredients, notes, and feedback
+                        // Display Ingredients
+                        if (mealDetails.ingredients.isNotEmpty()) {
                             ExpressiveDetailSection(
                                 title = "Ingredients",
-                                content = meal.rawExtractedIngredients.joinToString(", "),
+                                // Format the ingredients list as a single string or create a sub-list UI
+                                content = mealDetails.ingredients.joinToString("\n") { ing ->
+                                    val quantityStr = if (ing.quantity == ing.quantity.toInt().toDouble()) {
+                                        ing.quantity.toInt().toString() // Format as Int if it's a whole number
+                                    } else {
+                                        ing.quantity.toString() // Otherwise, use Double representation
+                                    }
+                                    "${ing.name} - $quantityStr ${ing.unit}".trim()
+                                },
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
-                        
-                        if (meal.rawExtractedTriggers.isNotEmpty()) {
-                            ExpressiveDetailSection(
-                                title = "Potential Triggers",
-                                content = meal.rawExtractedTriggers.joinToString(", "),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
 
-                        meal.notes?.let { notes ->
+                        // Display Meal Notes (from mealDetails.meal.notes)
+                        mealDetails.meal.notes?.let { notes ->
                             if (notes.isNotBlank()) {
                                 ExpressiveDetailSection(
                                     title = "Notes",
@@ -508,6 +502,18 @@ fun ExpressiveMealTimelineItem(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
+                        }
+
+                        // Display UserFeedback (optional)
+                        if (mealDetails.feedback.isNotEmpty()) {
+                             mealDetails.feedback.firstOrNull()?.let { fb -> // Show first feedback as example
+                                 ExpressiveDetailSection(
+                                    title = "Feedback: ${fb.feelingDescription}",
+                                    content = fb.feedbackNotes ?: "No detailed notes.",
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                             }
                         }
                     }
                 }
