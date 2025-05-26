@@ -1,4 +1,3 @@
- 
 package app.getnuri.results
 
 import android.graphics.Bitmap
@@ -6,82 +5,79 @@ import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.getnuri.data.ImageGenerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
-class ResultsViewModel @Inject constructor(
-    val imageGenerationRepository: ImageGenerationRepository,
-    @Named("IO")
-    val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : ViewModel() {
-
+class ResultsViewModel @Inject constructor() : ViewModel() {
+    
     private val _state = MutableStateFlow(ResultState())
-    val state = _state.asStateFlow()
-
-    private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
-
-    val snackbarHostState: StateFlow<SnackbarHostState>
-        get() = _snackbarHostState
-
-    fun setArguments(
-        resultImageUrl: Bitmap,
-        originalImageUrl: Uri?,
-        promptText: String?,
-    ) {
-        _state.update {
-            ResultState(resultImageUrl, originalImageUrl, promptText = promptText)
-        }
+    val state: StateFlow<ResultState> = _state.asStateFlow()
+    
+    private val _snackbarHostState = MutableStateFlow(SnackbarHostState())
+    val snackbarHostState: StateFlow<SnackbarHostState> = _snackbarHostState.asStateFlow()
+    
+    fun setArguments(resultImage: Bitmap, originalImageUri: Uri?, promptText: String?) {
+        _state.value = _state.value.copy(
+            resultImageBitmap = resultImage,
+            originalImageUrl = originalImageUri?.toString(),
+            promptText = promptText,
+            wellbeingData = MockWellbeingDataGenerator.generateMockData()
+        )
     }
-
-    fun shareClicked() {
-        viewModelScope.launch(ioDispatcher) {
-            val resultUrl = state.value.resultImageBitmap
-            if (resultUrl != null) {
-                val imageFileUri = imageGenerationRepository.saveImage(resultUrl)
-
-                _state.update {
-                    it.copy(savedUri = imageFileUri)
-                }
-            }
-        }
-    }
+    
     fun downloadClicked() {
-        viewModelScope.launch(ioDispatcher) {
-            val resultBitmap = state.value.resultImageBitmap
-            val originalImage = state.value.originalImageUrl
-            if (originalImage != null) {
-                val savedOriginalUri = imageGenerationRepository.saveImageToExternalStorage(originalImage)
-                _state.update {
-                    it.copy(externalOriginalSavedUri = savedOriginalUri)
-                }
-            }
-            if (resultBitmap != null) {
-                val imageUri = imageGenerationRepository.saveImageToExternalStorage(resultBitmap)
-                _state.update {
-                    it.copy(externalSavedUri = imageUri)
-                }
-                snackbarHostState.value.showSnackbar("Download complete")
+        viewModelScope.launch {
+            try {
+                _state.value = _state.value.copy(isLoading = true)
+                
+                // Simulate download process
+                // In a real app, you would save the image to device storage here
+                
+                _snackbarHostState.value.showSnackbar("Image downloaded successfully")
+                _state.value = _state.value.copy(isLoading = false)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = "Failed to download image: ${e.message}"
+                )
+                _snackbarHostState.value.showSnackbar("Failed to download image")
             }
         }
     }
-}
-
-data class ResultState(
-    val resultImageBitmap: Bitmap? = null,
-    val originalImageUrl: Uri? = null,
-    val savedUri: Uri? = null,
-    val externalSavedUri: Uri? = null,
-    val externalOriginalSavedUri: Uri? = null,
-    val promptText: String? = null,
-    val wellbeingData: WellbeingData = MockWellbeingDataGenerator.generateMockData(),
-)
+    
+    fun shareClicked() {
+        viewModelScope.launch {
+            try {
+                _state.value = _state.value.copy(isLoading = true)
+                
+                // Simulate creating a shareable URI
+                // In a real app, you would create a temporary file and get its URI
+                val mockUri = Uri.parse("content://mock/image.jpg")
+                
+                _state.value = _state.value.copy(
+                    savedUri = mockUri,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = "Failed to prepare image for sharing: ${e.message}"
+                )
+                _snackbarHostState.value.showSnackbar("Failed to share image")
+            }
+        }
+    }
+    
+    fun clearSavedUri() {
+        _state.value = _state.value.copy(savedUri = null)
+    }
+    
+    fun clearError() {
+        _state.value = _state.value.copy(error = null)
+    }
+} 

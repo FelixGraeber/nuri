@@ -11,28 +11,16 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import app.getnuri.camera.CameraPreviewScreen
-import app.getnuri.creation.CreationScreen
+
 import app.getnuri.home.AboutScreen
 import app.getnuri.home.MealTrackingChoiceScreen
-import app.getnuri.theme.transitions.ColorSplashTransitionScreen
-// import app.getnuri.feature.nuri_creation.photo.capture.MealPhotoCaptureScreen
-// import app.getnuri.feature.nuri_creation.photo.confirm.MealPhotoConfirmationScreen
-// import app.getnuri.feature.nuri_creation.text.entry.MealTextEntryScreen
 import app.getnuri.history.MealHistoryScreen
-// import app.getnuri.history.EnhancedHistoryScreen
 import app.getnuri.feature.nuri_creation.ingredient.IngredientExtractionScreen
 import app.getnuri.feature.wellbeing.WellbeingScreen
 import app.getnuri.results.ResultsScreen
@@ -115,9 +103,11 @@ fun MainNavigation() {
                     )
                 }
                 
-                entry<Create> { createKey ->
-                    CreationScreen(
-                        createKey.fileName,
+                entry<Create> { _ ->
+                    // TODO: Replace with actual creation screen implementation
+                    MealTrackingChoiceScreen(
+                        fileName = null,
+                        navigationPadding = paddingValues,
                         onCameraPressed = {
                             backStack.removeAll { it is Camera }
                             backStack.add(Camera)
@@ -125,9 +115,10 @@ fun MainNavigation() {
                         onBackPressed = {
                             backStack.removeLastOrNull()
                         },
-                        onAboutPressed = {
+                        onAboutClicked = {
                             backStack.add(About)
                         },
+                        onMealLogged = { _, _ -> }
                     )
                 }
                 

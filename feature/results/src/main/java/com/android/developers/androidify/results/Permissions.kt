@@ -1,4 +1,3 @@
- 
 @file:OptIn(ExperimentalPermissionsApi::class)
 
 package app.getnuri.results
@@ -10,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
+import app.getnuri.results.R
 
 @Composable
 fun PermissionRationaleDialog(

@@ -1,72 +1,32 @@
- 
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)
-
 package app.getnuri.results
 
-import android.Manifest
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.EaseOutBack
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.stringArrayResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.getnuri.theme.AndroidifyTheme
-import app.getnuri.theme.components.AndroidifyTopAppBar
-import app.getnuri.theme.components.PrimaryButton
-import app.getnuri.theme.components.ResultsBackground
-import app.getnuri.util.AdaptivePreview
-import app.getnuri.util.SmallPhonePreview
-import app.getnuri.util.allowsFullContent
-import app.getnuri.util.isAtLeastMedium
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 
 @Composable
 fun ResultsScreen(
@@ -77,7 +37,7 @@ fun ResultsScreen(
     verboseLayout: Boolean = allowsFullContent(),
     onBackPress: () -> Unit,
     onAboutPress: () -> Unit,
-    viewModel: ResultsViewModel = hiltViewModel<ResultsViewModel>(),
+    viewModel: ResultsViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(resultImage, originalImageUri, promptText) {
@@ -88,6 +48,7 @@ fun ResultsScreen(
         val savedImageUri = state.value.savedUri
         if (savedImageUri != null) {
             shareImage(context, savedImageUri)
+            viewModel.clearSavedUri()
         }
     }
     val snackbarHostState by viewModel.snackbarHostState.collectAsStateWithLifecycle()
@@ -113,12 +74,11 @@ fun ResultsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary),
     ) { contentPadding ->
-
         ResultsScreenContents(
             contentPadding,
             state,
             verboseLayout = verboseLayout,
-            {
+            downloadClicked = {
                 viewModel.downloadClicked()
             },
             shareClicked = {
@@ -173,256 +133,6 @@ private fun ResultsScreenPreviewSmall() {
             verboseLayout = false,
             downloadClicked = {},
             shareClicked = {},
-        )
-    }
-}
-
-@Composable
-fun ResultsScreenContents(
-    contentPadding: PaddingValues,
-    state: State<ResultState>,
-    verboseLayout: Boolean = allowsFullContent(),
-    downloadClicked: () -> Unit,
-    shareClicked: () -> Unit,
-    defaultSelectedResult: ResultOption = ResultOption.ResultImage,
-) {
-    val showResult = state.value.resultImageBitmap != null
-    var selectedResultOption by remember {
-        mutableStateOf(defaultSelectedResult)
-    }
-    val wasPromptUsed = state.value.originalImageUrl == null
-    val promptToolbar = @Composable { modifier: Modifier ->
-        ResultToolbarOption(
-            modifier = modifier,
-            selectedResultOption,
-            wasPromptUsed,
-            onResultOptionSelected = { option ->
-                selectedResultOption = option
-            },
-        )
-    }
-    val mainContent = @Composable { modifier: Modifier ->
-        when (selectedResultOption) {
-            ResultOption.WellbeingCharts -> {
-                AnimatedVisibility(
-                    visible = true,
-                    enter = fadeIn(tween(300, delayMillis = 500)) + slideInVertically(
-                        tween(1000, easing = EaseOutBack, delayMillis = 500),
-                        initialOffsetY = { fullHeight -> fullHeight },
-                    ),
-                ) {
-                    WellbeingChartsSection(
-                        wellbeingData = state.value.wellbeingData,
-                        modifier = modifier
-                    )
-                }
-            }
-            else -> {
-                AnimatedVisibility(
-                    showResult,
-                    enter = fadeIn(tween(300, delayMillis = 1000)) + slideInVertically(
-                        tween(1000, easing = EaseOutBack, delayMillis = 1000),
-                        initialOffsetY = { fullHeight -> fullHeight },
-                    ),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                    ) {
-                        BotResultCard(
-                            state.value.resultImageBitmap!!,
-                            state.value.originalImageUrl,
-                            state.value.promptText,
-                            modifier = Modifier.align(Alignment.Center),
-                            flippableState = selectedResultOption.toFlippableState(),
-                            onFlipStateChanged = { flipOption ->
-                                selectedResultOption = when (flipOption) {
-                                    FlippableState.Front -> ResultOption.ResultImage
-                                    FlippableState.Back -> ResultOption.OriginalInput
-                                }
-                            },
-                        )
-                    }
-                }
-            }
-        }
-    }
-    val buttonRow = @Composable { modifier: Modifier ->
-        BotActionsButtonRow(
-            onShareClicked = {
-                shareClicked()
-            },
-            onDownloadClicked = {
-                downloadClicked()
-            },
-            modifier = modifier,
-            verboseLayout = verboseLayout,
-        )
-    }
-    val backgroundQuotes = @Composable { modifier: Modifier ->
-        AnimatedVisibility(
-            showResult,
-            enter = slideInHorizontally(animationSpec = tween(1000)) { fullWidth -> fullWidth },
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            BackgroundRandomQuotes(verboseLayout)
-        }
-    }
-
-    // Draw the actual content
-    if (verboseLayout) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        ) {
-            promptToolbar(Modifier.align(Alignment.CenterHorizontally))
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
-            ) {
-                if (selectedResultOption != ResultOption.WellbeingCharts) {
-                    backgroundQuotes(Modifier)
-                }
-                mainContent(Modifier)
-            }
-            if (selectedResultOption != ResultOption.WellbeingCharts) {
-                buttonRow(
-                    Modifier
-                        .padding(bottom = 16.dp, top = 16.dp)
-                        .align(Alignment.CenterHorizontally),
-                )
-            }
-        }
-    } else {
-        Box {
-            if (selectedResultOption != ResultOption.WellbeingCharts) {
-                backgroundQuotes(Modifier.fillMaxSize())
-            }
-            mainContent(Modifier)
-            promptToolbar(
-                Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(bottom = 16.dp),
-            )
-            if (selectedResultOption != ResultOption.WellbeingCharts) {
-                buttonRow(
-                    Modifier
-                        .padding(bottom = 16.dp, end = 16.dp)
-                        .align(Alignment.BottomEnd),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BackgroundRandomQuotes(verboseLayout: Boolean = true) {
-    val locaInspectionMode = LocalInspectionMode.current
-    Box(modifier = Modifier.fillMaxSize()) {
-        val listResultCompliments = stringArrayResource(R.array.list_compliments)
-        val randomQuote = remember {
-            if (locaInspectionMode) {
-                listResultCompliments.first()
-            } else {
-                listResultCompliments.random()
-            }
-        }
-        // Disable animation in tests
-        val iterations = if (LocalInspectionMode.current) 0 else 100
-        Text(
-            randomQuote,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = Bold),
-            fontSize = 120.sp,
-            modifier = Modifier
-                .align(if (verboseLayout) Alignment.TopCenter else Alignment.Center)
-                .basicMarquee(iterations = iterations, repeatDelayMillis = 0, velocity = 80.dp, initialDelayMillis = 500),
-        )
-        if (verboseLayout) {
-            val listMinusOther = listResultCompliments.asList().minus(randomQuote)
-            val randomQuote2 = remember {
-                if (locaInspectionMode) {
-                    listMinusOther.first()
-                } else {
-                    listMinusOther.random()
-                }
-            }
-            Text(
-                randomQuote2,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = Bold),
-                fontSize = 110.sp,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .basicMarquee(iterations = iterations, repeatDelayMillis = 0, velocity = 60.dp, initialDelayMillis = 500),
-            )
-        }
-    }
-}
-
-@Composable
-private fun BotActionsButtonRow(
-    onShareClicked: () -> Unit,
-    onDownloadClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-    verboseLayout: Boolean = false,
-) {
-    Row(modifier) {
-        PrimaryButton(
-            onClick = {
-                onShareClicked()
-            },
-            leadingIcon = {
-                Row {
-                    Icon(
-                        ImageVector
-                            .vectorResource(app.getnuri.theme.R.drawable.sharp_share_24),
-                        contentDescription = null, // decorative element
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-            },
-            buttonText = if (verboseLayout) stringResource(R.string.share_your_bot) else null,
-        )
-        Spacer(Modifier.width(8.dp))
-        val externalStoragePermission = rememberPermissionState(
-            permission = Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        )
-        val mustGrantPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            false
-        } else {
-            !externalStoragePermission.status.isGranted
-        }
-        var showRationaleDialog by remember {
-            mutableStateOf(false)
-        }
-        PrimaryButton(
-            onClick = {
-                if (mustGrantPermission) {
-                    if (externalStoragePermission.status.shouldShowRationale) {
-                        showRationaleDialog = true
-                    } else {
-                        externalStoragePermission.launchPermissionRequest()
-                    }
-                    externalStoragePermission.launchPermissionRequest()
-                } else {
-                    onDownloadClicked()
-                }
-            },
-            leadingIcon = {
-                Icon(
-                    ImageVector
-                        .vectorResource(R.drawable.rounded_download_24),
-                    contentDescription = stringResource(R.string.download_bot),
-                )
-            },
-        )
-        PermissionRationaleDialog(
-            showRationaleDialog,
-            onDismiss = {
-                showRationaleDialog = false
-            },
-            externalStoragePermission,
         )
     }
 }

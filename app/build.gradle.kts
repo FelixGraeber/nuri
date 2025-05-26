@@ -90,6 +90,7 @@ baselineProfile() {
 }
 
 dependencies {
+    implementation(project(":data"))
     debugImplementation(libs.leakcanary.android)
     implementation(libs.androidx.app.startup)
     implementation(platform(libs.androidx.compose.bom))
@@ -120,7 +121,6 @@ dependencies {
     implementation(libs.androidx.window)
 
     implementation(project(":feature:camera"))
-    implementation(project(":feature:creation"))
     implementation(project(":feature:home"))
     implementation(project(":feature:results"))
     

@@ -88,19 +88,4 @@ internal object DataModule {
     fun providesGeminiNanoDataSource(geminiNanoDownloader: GeminiNanoDownloader): GeminiNanoGenerationDataSource =
         GeminiNanoGenerationDataSourceImpl(geminiNanoDownloader)
 
-    @Provides
-    @Singleton
-    fun imageGenerationRepository(
-        remoteConfigDataSource: RemoteConfigDataSource,
-        localFileProvider: LocalFileProvider,
-        internetConnectivityManager: InternetConnectivityManager,
-        firebaseAiDataSource: FirebaseAiDataSource,
-        geminiNanoGenerationDataSource: GeminiNanoGenerationDataSource,
-    ): ImageGenerationRepository = ImageGenerationRepositoryImpl(
-        remoteConfigDataSource = remoteConfigDataSource,
-        localFileProvider = localFileProvider,
-        geminiNanoDataSource = geminiNanoGenerationDataSource,
-        internetConnectivityManager = internetConnectivityManager,
-        firebaseAiDataSource = firebaseAiDataSource,
-    )
 }

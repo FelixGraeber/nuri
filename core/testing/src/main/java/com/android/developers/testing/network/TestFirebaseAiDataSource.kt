@@ -26,28 +26,4 @@ class TestFirebaseAiDataSource(val promptOutput: List<String>) : FirebaseAiDataS
     override suspend fun generateNutritionPrompt(prompt: String): GeneratedPrompt {
         return GeneratedPrompt(true, promptOutput)
     }
-    
-    // Legacy methods for backward compatibility
-    override suspend fun validatePromptHasEnoughInformation(inputPrompt: String): ValidatedDescription {
-        return processSymptomInput(inputPrompt)
-    }
-
-    override suspend fun validateImageHasEnoughInformation(image: Bitmap): ValidatedImage {
-        return validateMealPhoto(image)
-    }
-
-    override suspend fun generateDescriptivePromptFromImage(image: Bitmap): ValidatedDescription {
-        return analyzeMealFromImage(image)
-    }
-
-    override suspend fun generateImageFromPromptAndSkinTone(
-        prompt: String,
-        skinTone: String,
-    ): Bitmap {
-        return createBitmap(1, 1)
-    }
-
-    override suspend fun generatePrompt(prompt: String): GeneratedPrompt {
-        return generateNutritionPrompt(prompt)
-    }
 }

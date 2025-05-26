@@ -1,6 +1,4 @@
  
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
-
 package app.getnuri.results
 
 import androidx.compose.animation.core.Animatable
@@ -24,7 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -389,7 +387,7 @@ private fun EnergyBarChart(
         
         dates.forEachIndexed { dateIndex, date ->
             val dayEntries = groupedEntries[date] ?: emptyList()
-            val timeSlots = listOf("morning", "afternoon", "evening")
+            val timeSlots = listOf("Morning", "Afternoon", "Evening")
             val colors = listOf(
                 Color(0xFFFBBF24), // Yellow for morning
                 Color(0xFFF97316), // Orange for afternoon
@@ -399,7 +397,7 @@ private fun EnergyBarChart(
             timeSlots.forEachIndexed { timeIndex, timeSlot ->
                 val entry = dayEntries.find { it.timeOfDay == timeSlot }
                 if (entry != null) {
-                    val barHeight = ((entry.energy - 1f) / 9f) * chartHeight * progress
+                    val barHeight = ((entry.energyLevel - 1f) / 9f) * chartHeight * progress
                     val x = startX + dateIndex * (barWidth * 3 + groupSpacing) + timeIndex * barWidth
                     val y = startY + chartHeight - barHeight
                     
@@ -468,11 +466,11 @@ private fun SymptomsScatterChart(
         symptomEntries.forEachIndexed { index, entry ->
             val dayIndex = java.time.temporal.ChronoUnit.DAYS.between(dateRange.first, entry.date).toInt()
             val x = startX + (dayIndex.toFloat() / (daysDiff - 1)) * chartWidth
-            val y = startY + chartHeight - ((entry.intensity - 1f) / 9f) * chartHeight
+            val y = startY + chartHeight - ((entry.severity - 1f) / 9f) * chartHeight
             
             val symptomIndex = uniqueSymptoms.indexOf(entry.symptom)
             val color = symptomColors[symptomIndex % symptomColors.size]
-            val radius = (entry.intensity / 10f) * 16.dp.toPx() + 4.dp.toPx()
+            val radius = (entry.severity / 10f) * 16.dp.toPx() + 4.dp.toPx()
             
             val pointProgress = (progress * symptomEntries.size - index).coerceIn(0f, 1f)
             

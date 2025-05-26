@@ -40,12 +40,11 @@ include(":core:testing")
 
 // Feature modules
 include(":feature:camera")
-include(":feature:creation")
 include(":feature:nuri-creation")
 include(":feature:home")
 include(":feature:results")
 include(":feature:history")
-include(":feature:wellbeing")
+include(":feature:wellbeing") // Removed the trailing whitespace
 
 // Data and other modules
 include(":data")

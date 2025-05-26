@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Simple robot placeholder body -->
+    <path
+        android:fillColor="#726BF6"
+        android:pathData="M50,50 L150,50 L150,150 L50,150 Z" />
+    
+    <!-- Left eye -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M75,75 m-10,0 a10,10 0 1,1 20,0 a10,10 0 1,1 -20,0" />
+    
+    <!-- Right eye -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M125,75 m-10,0 a10,10 0 1,1 20,0 a10,10 0 1,1 -20,0" />
+    
+    <!-- Left pupil -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M75,75 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0" />
+    
+    <!-- Right pupil -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M125,75 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0" />
+    
+    <!-- Mouth -->
+    <path
+        android:pathData="M80,110 Q100,125 120,110" 
+        android:strokeWidth="3"
+        android:strokeColor="#000000" />
+        
+</vector> 

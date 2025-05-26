@@ -36,18 +36,6 @@ interface FirebaseAiDataSource {
     suspend fun analyzeMealFromImage(image: Bitmap): ValidatedDescription
     suspend fun processSymptomInput(inputPrompt: String): ValidatedDescription
     suspend fun generateNutritionPrompt(prompt: String): GeneratedPrompt
-    
-    // Legacy methods for backward compatibility
-    @Deprecated("Use validateMealPhoto() instead")
-    suspend fun validatePromptHasEnoughInformation(inputPrompt: String): ValidatedDescription
-    @Deprecated("Use validateMealPhoto() instead") 
-    suspend fun validateImageHasEnoughInformation(image: Bitmap): ValidatedImage
-    @Deprecated("Use analyzeMealFromImage() instead")
-    suspend fun generateDescriptivePromptFromImage(image: Bitmap): ValidatedDescription
-    @Deprecated("Not applicable for nutrition tracking")
-    suspend fun generateImageFromPromptAndSkinTone(prompt: String, skinTone: String): Bitmap
-    @Deprecated("Use generateNutritionPrompt() instead")
-    suspend fun generatePrompt(prompt: String): GeneratedPrompt
 }
 
 @OptIn(PublicPreviewAPI::class)
@@ -146,28 +134,6 @@ class FirebaseAiDataSourceImpl @Inject constructor(
         )
         val generativeModel = createGenerativeTextModel(jsonSchema, temperature = 0.75f)
         return executePromptGeneration(generativeModel, prompt)
-    }
-
-    // Legacy methods for backward compatibility
-    override suspend fun validatePromptHasEnoughInformation(inputPrompt: String): ValidatedDescription {
-        return processSymptomInput(inputPrompt)
-    }
-
-    override suspend fun validateImageHasEnoughInformation(image: Bitmap): ValidatedImage {
-        return validateMealPhoto(image)
-    }
-
-    override suspend fun generateDescriptivePromptFromImage(image: Bitmap): ValidatedDescription {
-        return analyzeMealFromImage(image)
-    }
-
-    override suspend fun generateImageFromPromptAndSkinTone(prompt: String, skinTone: String): Bitmap {
-        // Not applicable for nutrition tracking - return a placeholder or throw
-        throw UnsupportedOperationException("Image generation not supported in nutrition tracking mode")
-    }
-
-    override suspend fun generatePrompt(prompt: String): GeneratedPrompt {
-        return generateNutritionPrompt(prompt)
     }
 
     // Private helper methods remain the same
