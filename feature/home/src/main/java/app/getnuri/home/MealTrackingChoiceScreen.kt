@@ -539,8 +539,7 @@ fun MealTextPrompt(
                 if (textFieldState.text.isEmpty()) {
                     Text(
                         "What did you eat? Be as detailed as you'd like...",
-                        color = Color(0xFF4A148C),
-                        fontSize = 24.sp,
+                        fontSize = 28.sp,
                     )
                 }
                 innerTextField()
