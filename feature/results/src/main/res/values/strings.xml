@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="grant_storage_permission">Grant Storage Permission</string>
-    <string name="to_save_your_bot_to_the_device_you_need_to_grant_storage_permission">To save your results to the device, you need to grant storage permission</string>
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
     <string name="download">Download</string>

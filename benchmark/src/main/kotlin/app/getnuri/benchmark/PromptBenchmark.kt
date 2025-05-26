@@ -1,4 +1,3 @@
- 
 package app.getnuri.benchmark
 
 import android.os.Build

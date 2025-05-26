@@ -17,7 +17,7 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class AndroidifyApplication : Application(), SingletonImageLoader.Factory {
+class NuriApplication : Application(), SingletonImageLoader.Factory {
 
     @Inject
     lateinit var imageLoader: dagger.Lazy<ImageLoader>
