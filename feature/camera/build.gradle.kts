@@ -1,11 +1,10 @@
- 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.composeScreenshot)
+    id("kotlin-kapt")
 }
 
 android {
@@ -28,14 +27,17 @@ android {
         compose = true
     }
 
-    experimentalProperties["android.experimental.enableScreenshotTest"] = true
-
     testOptions {
         targetSdk = 36
     }
 }
 
 dependencies {
+    implementation(project(":core"))
+    implementation(project(":core:theme"))
+    implementation(project(":core:util"))
+    implementation(project(":data"))
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
     implementation(libs.hilt.android)
@@ -57,10 +59,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.tooling.preview)
 
-    implementation(project(":core:theme"))
-    implementation(project(":core:util"))
-    implementation(project(":data"))
-
     // Android Instrumented Tests
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
@@ -71,5 +69,17 @@ dependencies {
     kspAndroidTest(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.ui.test.manifest)
-    screenshotTestImplementation(libs.androidx.ui.tooling)
+
+    // Compose
+    implementation("androidx.compose.ui:ui:1.5.8")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    
+    // Image loading
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 }

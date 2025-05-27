@@ -1,10 +1,10 @@
- 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
+    id("kotlin-kapt")
 }
 
 android {
@@ -32,29 +32,30 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(project(":core:theme"))
     implementation(project(":data")) // For Meal, UserFeedback, MealDao, UserFeedbackDao
     // implementation(project(":core:util")) // If a utility module exists and is needed
 
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.foundation.layout)
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.activity.compose)
     ksp(libs.hilt.compiler)
 
-    // Coil for image loading (optional, but good to have if displaying images)
-    implementation(libs.coil.compose)
+    // Compose
+    implementation("androidx.compose.ui:ui:1.5.8")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    
+    // Image loading
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 
     // Testing Dependencies
     testImplementation(libs.junit)

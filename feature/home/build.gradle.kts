@@ -1,11 +1,10 @@
- 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.composeScreenshot)
+    id("kotlin-kapt")
 }
 
 android {
@@ -27,8 +26,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
     testOptions {
         targetSdk = 36
@@ -73,4 +70,9 @@ dependencies {
     kspAndroidTest(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Compose
+    implementation("androidx.compose.ui:ui:1.5.8")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.activity:activity-compose:1.8.2")
 }

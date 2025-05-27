@@ -1,4 +1,3 @@
- 
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import java.io.FileInputStream
 import java.util.Properties
@@ -13,6 +12,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.baselineprofile)
+    id("kotlin-kapt")
 }
 
 
@@ -148,6 +148,21 @@ dependencies {
     kspAndroidTest(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(project(":core"))
+    implementation(project(":core:theme"))
+    implementation(project(":data"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:camera"))
+    implementation(project(":feature:wellbeing"))
+    implementation(project(":feature:history"))
+    
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+    
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 }
 
 androidComponents {

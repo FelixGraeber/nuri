@@ -1,10 +1,10 @@
- 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.serialization)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt)
+    id("kotlin-kapt")
 }
 
 android {
@@ -31,6 +31,7 @@ androidComponents {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(project(":core:network"))
     implementation(project(":core:util"))
 
@@ -48,9 +49,9 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // Room dependencies
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 
     // Encrypted Room (SQLCipher)
     implementation("net.zetetic:android-database-sqlcipher:4.5.2")
@@ -61,4 +62,11 @@ dependencies {
 
     // Gson for the new converters (if not already present)
     implementation("com.google.code.gson:gson:2.10")
+
+    // Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 }

@@ -1,10 +1,10 @@
- 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
+    id("kotlin-kapt")
 }
 
 android {
@@ -32,8 +32,15 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(project(":core:theme"))
     implementation(project(":data"))
+
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
@@ -48,8 +55,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
     // Testing Dependencies
@@ -59,4 +64,14 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.turbine)
+
+    // Compose
+    implementation("androidx.compose.ui:ui:1.5.8")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 } 

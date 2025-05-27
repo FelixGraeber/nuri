@@ -1,10 +1,10 @@
- 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.serialization)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt)
+    id("kotlin-kapt")
 }
 
 android {
@@ -44,6 +44,7 @@ androidComponents {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(libs.androidx.app.startup)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
@@ -72,4 +73,12 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     androidTestImplementation(project(":core:testing"))
     kspAndroidTest(libs.hilt.compiler)
+
+    // Network
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 }
