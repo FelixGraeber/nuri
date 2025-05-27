@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 
 @Composable
 internal fun CameraControls(
@@ -54,7 +54,7 @@ internal fun CameraControls(
 @Preview
 @Composable
 private fun CameraControlsPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         CameraControls(
             captureImageClicked = { },
             canFlipCamera = true,

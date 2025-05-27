@@ -10,7 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import app.getnuri.navigation.MainNavigation
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalMaterial3ExpressiveApi
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidifyTheme {
+            NuriTheme {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.light(
                         Color.Transparent.toArgb(),

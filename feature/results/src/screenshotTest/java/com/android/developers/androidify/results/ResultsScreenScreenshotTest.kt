@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.util.AdaptivePreview
 import app.getnuri.util.SmallPhonePreview
 
@@ -35,7 +35,7 @@ class ResultsScreenScreenshotTest {
             )
         }
         CompositionLocalProvider(value = LocalInspectionMode provides true) {
-            AndroidifyTheme {
+            NuriTheme {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,
@@ -61,7 +61,7 @@ class ResultsScreenScreenshotTest {
             )
         }
         CompositionLocalProvider(value = LocalInspectionMode provides true) {
-            AndroidifyTheme {
+            NuriTheme {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,
@@ -86,7 +86,7 @@ class ResultsScreenScreenshotTest {
             )
         }
         CompositionLocalProvider(value = LocalInspectionMode provides true) {
-            AndroidifyTheme {
+            NuriTheme {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,

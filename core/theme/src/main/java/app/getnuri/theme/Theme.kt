@@ -74,7 +74,7 @@ val shapes = Shapes(
 )
 
 @Composable
-fun AndroidifyTheme(
+fun NuriTheme(
     content: @Composable () -> Unit,
 ) {
     val colorScheme = LightColorScheme

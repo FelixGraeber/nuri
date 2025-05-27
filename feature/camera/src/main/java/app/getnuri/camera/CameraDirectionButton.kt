@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -49,7 +49,7 @@ fun CameraDirectionButton(
 @Preview
 @Composable
 fun CameraDirectionButtonPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         CameraDirectionButton(
             flipCameraDirection = {},
         )

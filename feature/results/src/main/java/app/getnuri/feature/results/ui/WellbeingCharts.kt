@@ -35,6 +35,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -43,7 +44,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.getnuri.theme.NuriTheme // Changed from AndroidifyTheme
+import app.getnuri.theme.NuriTheme 
+import app.getnuri.results.EnergyEntry
+import app.getnuri.results.MoodEntry
+import app.getnuri.results.SymptomEntry
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.cos
@@ -253,64 +257,32 @@ private fun DrawScope.drawMoodLine(
     progress: Float
 ) {
     if (moodEntries.size < 2) return
-    
+
     val path = Path()
-    val gradientColors = listOf(
-        Color(0xFF6366F1), // Indigo
-        Color(0xFF8B5CF6), // Purple
-        Color(0xFFEC4899)  // Pink
-    )
-    
-    val points = moodEntries.mapIndexed { index, entry ->
-        val x = startX + (index.toFloat() / (moodEntries.size - 1)) * chartWidth
+    moodEntries.forEachIndexed { i, entry ->
+        val x = startX + (i.toFloat() / (moodEntries.size - 1).coerceAtLeast(1)) * chartWidth
         val y = startY + chartHeight - ((entry.mood - 1f) / 9f) * chartHeight
-        Offset(x, y)
+
+        if (i == 0) {
+            path.moveTo(x, y)
+        } else {
+            path.lineTo(x, y)
+        }
     }
-    
-    // Create smooth curve through points
-    path.moveTo(points[0].x, points[0].y)
-    
-    for (i in 1 until points.size) {
-        val currentPoint = points[i]
-        val previousPoint = points[i - 1]
-        
-        val controlPoint1X = previousPoint.x + (currentPoint.x - previousPoint.x) * 0.5f
-        val controlPoint1Y = previousPoint.y
-        val controlPoint2X = currentPoint.x - (currentPoint.x - previousPoint.x) * 0.5f
-        val controlPoint2Y = currentPoint.y
-        
-        path.cubicTo(
-            controlPoint1X, controlPoint1Y,
-            controlPoint2X, controlPoint2Y,
-            currentPoint.x, currentPoint.y
-        )
-    }
-    
-    // Draw gradient fill
-    val fillPath = Path().apply {
-        addPath(path)
-        lineTo(points.last().x, startY + chartHeight)
-        lineTo(points.first().x, startY + chartHeight)
-        close()
-    }
-    
+
+    val animatedPath = Path()
+    val measure = PathMeasure()
+    measure.setPath(path, false)
+    measure.getSegment(0f, measure.length * progress, animatedPath, true)
+
     drawPath(
-        path = fillPath,
-        brush = Brush.verticalGradient(
-            colors = gradientColors.map { it.copy(alpha = 0.3f * progress) },
-            startY = startY,
-            endY = startY + chartHeight
-        )
-    )
-    
-    // Draw line stroke
-    drawPath(
-        path = path,
-        brush = Brush.horizontalGradient(gradientColors),
-        style = Stroke(
-            width = 4.dp.toPx() * progress,
-            cap = StrokeCap.Round
-        )
+        path = animatedPath,
+        brush = Brush.linearGradient(
+            colors = listOf(Color(0xFF3B82F6), Color(0xFF2DD4BF)),
+            start = Offset(startX, startY),
+            end = Offset(startX + chartWidth, startY + chartHeight)
+        ),
+        style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
     )
 }
 
@@ -322,31 +294,29 @@ private fun DrawScope.drawMoodPoints(
     chartHeight: Float,
     progress: Float
 ) {
-    moodEntries.forEachIndexed { index, entry ->
-        val x = startX + (index.toFloat() / (moodEntries.size - 1)) * chartWidth
+    moodEntries.forEachIndexed { i, entry ->
+        val x = startX + (i.toFloat() / (moodEntries.size - 1).coerceAtLeast(1)) * chartWidth
         val y = startY + chartHeight - ((entry.mood - 1f) / 9f) * chartHeight
-        
-        val pointProgress = (progress * moodEntries.size - index).coerceIn(0f, 1f)
-        
-        if (pointProgress > 0f) {
+
+        val pointProgress = (progress * moodEntries.size - i).coerceIn(0f, 1f)
+
+        if (pointProgress > 0) {
             // Outer glow
             drawCircle(
-                color = Color(0xFF6366F1).copy(alpha = 0.3f * pointProgress),
-                radius = 12.dp.toPx() * pointProgress,
+                color = Color(0xFF3B82F6).copy(alpha = 0.3f * pointProgress),
+                radius = 8.dp.toPx() * pointProgress,
                 center = Offset(x, y)
             )
-            
-            // Main point
+            // Inner circle
             drawCircle(
-                color = Color(0xFF6366F1),
-                radius = 6.dp.toPx() * pointProgress,
+                color = Color.White,
+                radius = 5.dp.toPx() * pointProgress,
                 center = Offset(x, y)
             )
-            
-            // Inner highlight
+            // Center dot
             drawCircle(
-                color = Color.White.copy(alpha = 0.8f),
-                radius = 2.dp.toPx() * pointProgress,
+                color = Color(0xFF3B82F6),
+                radius = 3.dp.toPx() * pointProgress,
                 center = Offset(x, y)
             )
         }
@@ -508,7 +478,7 @@ private fun SymptomsScatterChart(
 @Preview
 @Composable
 private fun WellbeingChartsPreview() {
-    NuriTheme { // Changed from AndroidifyTheme
+    NuriTheme { 
         Box(
             modifier = Modifier
                 .fillMaxSize()

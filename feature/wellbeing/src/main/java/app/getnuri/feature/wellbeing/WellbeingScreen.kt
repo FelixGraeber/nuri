@@ -517,7 +517,7 @@ private fun NotesSection() {
 @Preview
 @Composable
 private fun WellbeingScreenPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         WellbeingScreen()
     }
 } 

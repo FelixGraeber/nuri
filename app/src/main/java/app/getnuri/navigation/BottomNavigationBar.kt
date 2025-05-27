@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.Primary
 import app.getnuri.theme.PrimaryContainer
 import app.getnuri.theme.Secondary
@@ -191,7 +191,7 @@ fun NavigationRoute.toBottomNavTab(): BottomNavTab? = when (this) {
 @Preview(showBackground = true)
 @Composable
 private fun BottomNavigationBarPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = Primary // Use primary color background to match app theme
@@ -207,7 +207,7 @@ private fun BottomNavigationBarPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun BottomNavigationBarWellbeingSelectedPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = Primary // Use primary color background to match app theme

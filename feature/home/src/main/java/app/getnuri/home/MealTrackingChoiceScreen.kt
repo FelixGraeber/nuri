@@ -104,7 +104,7 @@ import androidx.graphics.shapes.rectangle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.LocalSharedTransitionScope
 import app.getnuri.theme.Primary
 import app.getnuri.theme.Secondary
@@ -708,7 +708,7 @@ private fun LoadingScreen(
 @Preview
 @Composable
 private fun MealTrackingChoiceScreenPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         MealTrackingChoiceScreen()
     }
 } 

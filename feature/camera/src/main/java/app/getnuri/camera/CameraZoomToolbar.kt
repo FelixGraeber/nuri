@@ -1,18 +1,18 @@
- 
 package app.getnuri.camera
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -24,7 +24,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import app.getnuri.theme.AndroidifyTheme
+import androidx.compose.ui.unit.dp
+import app.getnuri.theme.NuriTheme
 import kotlin.math.roundToInt
 
 @Composable
@@ -66,15 +67,33 @@ internal fun ZoomToolbar(
     }
     val textMeasurer = rememberTextMeasurer()
 
-    ButtonGroup(
+    Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-        expandedRatio = 0f,
+        horizontalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         ToggleButton(
             checked = selectedOptionIndex == 0,
             onCheckedChange = { onZoomLevelSelected(defaultZoomOptions[0]) },
-            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+            shapes = ToggleButtonShapes(
+                shape = RoundedCornerShape(
+                    topStart = 20.dp,
+                    bottomStart = 20.dp,
+                    topEnd = 0.dp,
+                    bottomEnd = 0.dp
+                ),
+                pressedShape = RoundedCornerShape(
+                    topStart = 20.dp,
+                    bottomStart = 20.dp,
+                    topEnd = 0.dp,
+                    bottomEnd = 0.dp
+                ),
+                checkedShape = RoundedCornerShape(
+                    topStart = 20.dp,
+                    bottomStart = 20.dp,
+                    topEnd = 0.dp,
+                    bottomEnd = 0.dp
+                )
+            ),
             colors = ToggleButtonDefaults.toggleButtonColors(),
             modifier = Modifier,
         ) {
@@ -85,7 +104,26 @@ internal fun ZoomToolbar(
         ToggleButton(
             checked = selectedOptionIndex == 1,
             onCheckedChange = { onZoomLevelSelected(defaultZoomOptions[1]) },
-            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+            shapes = ToggleButtonShapes(
+                shape = RoundedCornerShape(
+                    topStart = 0.dp,
+                    bottomStart = 0.dp,
+                    topEnd = 20.dp,
+                    bottomEnd = 20.dp
+                ),
+                pressedShape = RoundedCornerShape(
+                    topStart = 0.dp,
+                    bottomStart = 0.dp,
+                    topEnd = 20.dp,
+                    bottomEnd = 20.dp
+                ),
+                checkedShape = RoundedCornerShape(
+                    topStart = 0.dp,
+                    bottomStart = 0.dp,
+                    topEnd = 20.dp,
+                    bottomEnd = 20.dp
+                )
+            ),
             colors = ToggleButtonDefaults.toggleButtonColors(),
             modifier = Modifier,
         ) {
@@ -101,7 +139,7 @@ internal fun ZoomToolbar(
 private fun ZoomToolbarPreview() {
     var zoomLevel by remember { mutableFloatStateOf(0.4343f) }
 
-    AndroidifyTheme {
+    NuriTheme {
         Column {
             ZoomToolbar(
                 defaultZoomOptions = listOf(0.6f, 1f),

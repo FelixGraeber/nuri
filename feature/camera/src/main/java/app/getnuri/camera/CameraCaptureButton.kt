@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.Primary
 import app.getnuri.theme.PrimaryContainer
 import app.getnuri.theme.PrimaryFixed
@@ -38,7 +38,7 @@ import app.getnuri.theme.components.ScaleIndicationNodeFactory
 @Preview
 @Composable
 private fun CameraCaptureButtonPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         Row {
             CameraCaptureButton(enabled = false)
             CameraCaptureButton()

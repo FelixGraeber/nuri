@@ -1,5 +1,4 @@
- 
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+ @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
 package app.getnuri.camera
 
@@ -221,14 +220,23 @@ fun StatelessCameraPreviewContent(
             }
         },
         zoomButton = { zoomModifier ->
-            ZoomToolbar(
-                defaultZoomOptions = defaultZoomOptions,
-                onZoomLevelSelected = onAnimateZoom,
-                modifier = zoomModifier,
-                zoomLevel = zoomLevel,
-            )
+            // Create a proper composable function for the zoom toolbar
+            @Composable
+            fun ZoomToolbarContent() {
+                ZoomToolbar(
+                    defaultZoomOptions = defaultZoomOptions,
+                    onZoomLevelSelected = { zoom -> onAnimateZoom(zoom) },
+                    modifier = zoomModifier,
+                    zoomLevel = zoomLevel,
+                )
+            }
+            ZoomToolbarContent()
         },
         rearCameraButton = if (shouldShowRearCameraFeature()) rearCameraButton else emptyComposable,
+        guide = { /* Default empty guide */ },
+        guideText = { /* Default empty guide text */ },
+        supportsTabletop = false,
+        isTabletop = false,
         modifier = modifier.onSizeChanged { size ->
             if (size.height > 0) {
                 aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)

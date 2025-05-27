@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.fastRoundToInt
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.Primary
 import app.getnuri.theme.components.PrimaryButton
 
@@ -89,7 +89,7 @@ fun ColorSplashTransitionScreen(
 @Preview(showBackground = true)
 @Composable
 private fun ColorSplashPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         var buttonBounds by remember {
             mutableStateOf<RelativeLayoutBounds?>(null)
         }

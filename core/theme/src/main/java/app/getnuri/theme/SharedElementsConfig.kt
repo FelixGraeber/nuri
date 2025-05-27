@@ -203,7 +203,7 @@ fun Modifier.sharedBoundsRevealWithShapeMorph(
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
 fun SharedElementContextPreview(content: @Composable () -> Unit) {
-    AndroidifyTheme {
+    NuriTheme {
         AnimatedContent(targetState = Unit) {
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this) {
                 content()
@@ -215,7 +215,7 @@ fun SharedElementContextPreview(content: @Composable () -> Unit) {
 @Preview
 @Composable
 private fun SharedElementBoundsWithShapeMorph() {
-    AndroidifyTheme {
+    NuriTheme {
         var showFullScreen by remember {
             mutableStateOf(false)
         }

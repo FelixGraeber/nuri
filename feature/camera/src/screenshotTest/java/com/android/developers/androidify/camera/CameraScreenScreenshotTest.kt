@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.window.layout.FoldingFeature
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 
 class CameraScreenScreenshotTest {
 
@@ -27,7 +27,7 @@ class CameraScreenScreenshotTest {
     @Preview(showBackground = true, name = "Default State")
     @Composable
     fun CameraScreenScreenshot() {
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier ->
                     Box(
@@ -56,7 +56,7 @@ class CameraScreenScreenshotTest {
     @Preview(showBackground = true, name = "Pose Not Detected")
     @Composable
     fun CameraScreenPoseNotDetectedScreenshot() {
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier -> ViewfinderPlaceholder(modifier) },
                 detectedPose = false, // Changed
@@ -73,7 +73,7 @@ class CameraScreenScreenshotTest {
     @Preview(showBackground = true, name = "Cannot Flip Camera")
     @Composable
     fun CameraScreenCannotFlipScreenshot() {
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier -> ViewfinderPlaceholder(modifier) },
                 detectedPose = true,
@@ -90,7 +90,7 @@ class CameraScreenScreenshotTest {
     @Preview(showBackground = true, name = "Rear Camera Button (Disabled)")
     @Composable
     fun CameraScreenRearCamDisabledScreenshot() {
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier -> ViewfinderPlaceholder(modifier) },
                 detectedPose = true,
@@ -110,7 +110,7 @@ class CameraScreenScreenshotTest {
     @Preview(showBackground = true, name = "Rear Camera Button (Enabled)")
     @Composable
     fun CameraScreenRearCamEnabledScreenshot() {
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier -> ViewfinderPlaceholder(modifier) },
                 detectedPose = true,
@@ -134,7 +134,7 @@ class CameraScreenScreenshotTest {
             state = FoldingFeature.State.HALF_OPENED,
             orientation = FoldingFeature.Orientation.HORIZONTAL,
         )
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier -> ViewfinderPlaceholder(modifier) },
                 detectedPose = true,
@@ -152,7 +152,7 @@ class CameraScreenScreenshotTest {
     @Preview(showBackground = true, name = "Medium Horizontal", widthDp = 840, heightDp = 480)
     @Composable
     fun CameraScreenMediumHorizontalScreenshot() {
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier -> ViewfinderPlaceholder(modifier) },
                 detectedPose = true,
@@ -169,7 +169,7 @@ class CameraScreenScreenshotTest {
     @Preview(showBackground = true, name = "Subcompact Horizontal", widthDp = 600, heightDp = 400)
     @Composable
     fun CameraScreenSubcompactHorizontalScreenshot() {
-        AndroidifyTheme {
+        NuriTheme {
             StatelessCameraPreviewContent(
                 viewfinder = { modifier -> ViewfinderPlaceholder(modifier) },
                 detectedPose = true,

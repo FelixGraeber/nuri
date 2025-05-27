@@ -1,4 +1,3 @@
- 
 package app.getnuri.theme.components
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -43,7 +42,7 @@ import app.getnuri.theme.sharedBoundsReveal
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun AndroidifyTopAppBar(
+fun NuriTopAppBar(
     modifier: Modifier = Modifier,
     isMediumWindowSize: Boolean = false,
     backEnabled: Boolean = false,
@@ -83,7 +82,7 @@ fun AndroidifyTopAppBar(
                 if (customTitle != null) {
                     CustomTitle(customTitle, contentColor)
                 } else {
-                    AndroidifyTitle(contentColor)
+                    NuriTitle(contentColor)
                 }
             }
 
@@ -113,7 +112,7 @@ fun AndroidifyTopAppBar(
                 if (customTitle != null) {
                     CustomTitle(customTitle, contentColor)
                 } else {
-                    AndroidifyTitle(contentColor)
+                    NuriTitle(contentColor)
                 }
             },
             modifier = modifier
@@ -137,6 +136,31 @@ fun AndroidifyTopAppBar(
     }
 }
 
+// Legacy alias for backward compatibility - will be removed
+@Deprecated("Use NuriTopAppBar instead", ReplaceWith("NuriTopAppBar"))
+@Composable
+fun AndroidifyTopAppBar(
+    modifier: Modifier = Modifier,
+    isMediumWindowSize: Boolean = false,
+    backEnabled: Boolean = false,
+    aboutEnabled: Boolean = true,
+    customTitle: String? = null,
+    expandedCenterButtons: @Composable () -> Unit = {},
+    onBackPressed: () -> Unit = {},
+    onAboutClicked: () -> Unit = {},
+    useNuriStyling: Boolean = false,
+) = NuriTopAppBar(
+    modifier = modifier,
+    isMediumWindowSize = isMediumWindowSize,
+    backEnabled = backEnabled,
+    aboutEnabled = aboutEnabled,
+    customTitle = customTitle,
+    expandedCenterButtons = expandedCenterButtons,
+    onBackPressed = onBackPressed,
+    onAboutClicked = onAboutClicked,
+    useNuriStyling = useNuriStyling,
+)
+
 @Composable
 private fun BackButton(onBackPressed: () -> Unit, tintColor: Color = MaterialTheme.colorScheme.onSurface) {
     IconButton(onClick = onBackPressed) {
@@ -150,7 +174,7 @@ private fun BackButton(onBackPressed: () -> Unit, tintColor: Color = MaterialThe
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AndroidifyTranslucentTopAppBar(
+fun NuriTranslucentTopAppBar(
     modifier: Modifier = Modifier,
     isMediumSizeLayout: Boolean = false,
 ) {
@@ -158,7 +182,7 @@ fun AndroidifyTranslucentTopAppBar(
         TopAppBar(
             title = {
                 Spacer(Modifier.statusBarsPadding())
-                AndroidifyTitle()
+                NuriTitle()
             },
             modifier = modifier.clip(
                 MaterialTheme.shapes.large.copy(topStart = CornerSize(0f), topEnd = CornerSize(0f)),
@@ -169,7 +193,7 @@ fun AndroidifyTranslucentTopAppBar(
         CenterAlignedTopAppBar(
             title = {
                 Spacer(Modifier.statusBarsPadding())
-                AndroidifyTitle()
+                NuriTitle()
             },
             modifier = modifier.clip(
                 MaterialTheme.shapes.large.copy(topStart = CornerSize(0f), topEnd = CornerSize(0f)),
@@ -179,8 +203,16 @@ fun AndroidifyTranslucentTopAppBar(
     }
 }
 
+// Legacy alias for backward compatibility - will be removed
+@Deprecated("Use NuriTranslucentTopAppBar instead", ReplaceWith("NuriTranslucentTopAppBar"))
 @Composable
-private fun AndroidifyTitle(textColor: Color = MaterialTheme.colorScheme.onSurface) {
+fun AndroidifyTranslucentTopAppBar(
+    modifier: Modifier = Modifier,
+    isMediumSizeLayout: Boolean = false,
+) = NuriTranslucentTopAppBar(modifier, isMediumSizeLayout)
+
+@Composable
+private fun NuriTitle(textColor: Color = MaterialTheme.colorScheme.onSurface) {
     Text(
         text = stringResource(R.string.app_name_nuri),
         style = MaterialTheme.typography.titleLarge.copy(
@@ -191,6 +223,11 @@ private fun AndroidifyTitle(textColor: Color = MaterialTheme.colorScheme.onSurfa
         color = textColor
     )
 }
+
+// Legacy alias for backward compatibility - will be removed
+@Deprecated("Use NuriTitle instead", ReplaceWith("NuriTitle"))
+@Composable
+private fun AndroidifyTitle(textColor: Color = MaterialTheme.colorScheme.onSurface) = NuriTitle(textColor)
 
 @Composable
 private fun CustomTitle(title: String, textColor: Color = MaterialTheme.colorScheme.onSurface) {

@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
-        testInstrumentationRunner = "com.android.developers.testing.AndroidifyTestRunner"
+        testInstrumentationRunner = "com.android.developers.testing.NuriTestRunner"
     }
     buildFeatures {
         buildConfig = true

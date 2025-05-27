@@ -23,7 +23,6 @@ import app.getnuri.home.MealTrackingChoiceScreen
 import app.getnuri.history.MealHistoryScreen
 import app.getnuri.feature.nuri_creation.ingredient.IngredientExtractionScreen
 import app.getnuri.feature.wellbeing.WellbeingScreen
-import app.getnuri.results.ResultsScreen
 import app.getnuri.data.NuriMealAnalyzer
 import app.getnuri.data.model.MealAnalysisData
 // import app.getnuri.feature.feedback.entry.FeedbackEntryScreen
@@ -341,7 +340,7 @@ fun MainNavigation() {
                         onBackPressed = {
                             backStack.removeLastOrNull()
                         },
-                        onNextPressed = { finalIngredients ->
+                        onNextPressed = { _ -> // Renamed finalIngredients to _
                             // OPTIMIZED: Smart navigation back to main tab
                             backStack.removeAll { it !is MealTrackingChoiceTab }
                         }

@@ -41,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.LocalSharedTransitionScope
 import app.getnuri.theme.SharedElementContextPreview
 import app.getnuri.theme.SharedElementKey
@@ -258,7 +258,7 @@ fun BulletPoint(
 @Preview(showBackground = true)
 @Composable
 private fun BulletPointPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         BulletPoint("1", "Photo", "Take a photo")
     }
 }

@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.Primary
 import app.getnuri.theme.PrimaryContainer
 import app.getnuri.theme.Secondary
@@ -247,7 +247,7 @@ fun ExpressivePill(
 @Preview(showBackground = true)
 @Composable
 private fun ExpressiveComponentsPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         ExpressiveGradientBackground {
             Column(
                 modifier = Modifier

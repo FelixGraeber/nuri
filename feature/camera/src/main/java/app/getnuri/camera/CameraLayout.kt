@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.TertiaryContainer
 import app.getnuri.util.FoldablePreviewParameters
 import app.getnuri.util.FoldablePreviewParametersProvider
@@ -40,7 +40,11 @@ internal fun CameraLayout(
     captureButton: @Composable (modifier: Modifier) -> Unit,
     flipCameraButton: @Composable (modifier: Modifier) -> Unit,
     zoomButton: @Composable (modifier: Modifier) -> Unit,
+    guide: @Composable (modifier: Modifier) -> Unit,
+    guideText: @Composable (modifier: Modifier) -> Unit,
     rearCameraButton: @Composable (modifier: Modifier) -> Unit = {},
+    supportsTabletop: Boolean,
+    isTabletop: Boolean,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -54,6 +58,8 @@ internal fun CameraLayout(
             captureButton = captureButton,
             flipCameraButton = flipCameraButton,
             zoomButton = zoomButton,
+            guideText = guideText,
+            guide = guide,
             rearCameraButton = rearCameraButton
         )
     }
@@ -381,7 +387,7 @@ private fun VerticalControlsLayout(
 private fun CameraOverlayPreview(
     @PreviewParameter(FoldablePreviewParametersProvider::class) parameters: FoldablePreviewParameters,
 ) {
-    AndroidifyTheme {
+    NuriTheme {
         CameraLayout(
             viewfinder = { modifier ->
                 Box(

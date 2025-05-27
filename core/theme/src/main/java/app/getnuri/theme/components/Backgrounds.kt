@@ -24,7 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import app.getnuri.theme.AndroidifyTheme
+import app.getnuri.theme.NuriTheme
 import app.getnuri.theme.R
 import app.getnuri.util.LargeScreensPreview
 import app.getnuri.util.PhonePreview
@@ -79,7 +79,7 @@ fun ScallopBackground(modifier: Modifier = Modifier) {
 @LargeScreensPreview
 @Composable
 private fun SquiggleBackgroundLargePreview() {
-    AndroidifyTheme {
+    NuriTheme {
         SquiggleBackground(modifier = Modifier.fillMaxSize(), offsetHeightFraction = 0.5f)
     }
 }
@@ -87,7 +87,7 @@ private fun SquiggleBackgroundLargePreview() {
 @PhonePreview
 @Composable
 private fun SquiggleBackgroundPreview() {
-    AndroidifyTheme {
+    NuriTheme {
         SquiggleBackground(modifier = Modifier.fillMaxSize(), offsetHeightFraction = 0.5f)
     }
 }
@@ -95,7 +95,7 @@ private fun SquiggleBackgroundPreview() {
 @LargeScreensPreview
 @Composable
 private fun ResultsBackgroundLargePreview() {
-    AndroidifyTheme {
+    NuriTheme {
         ResultsBackground(isMediumWindowSize = true, modifier = Modifier.fillMaxSize())
     }
 }
@@ -103,7 +103,7 @@ private fun ResultsBackgroundLargePreview() {
 @PhonePreview
 @Composable
 private fun ResultsBackgroundPhonePreview() {
-    AndroidifyTheme {
+    NuriTheme {
         ResultsBackground(isMediumWindowSize = false, modifier = Modifier.fillMaxSize())
     }
 }
